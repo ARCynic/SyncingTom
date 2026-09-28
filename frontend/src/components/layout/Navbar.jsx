@@ -15,7 +15,11 @@ const items = [
   },
   {
     label: "Meter Sequence",
-    to: "/tools/meter-sequence",
+    to: "/meter-sequence",
+  },
+  {
+    label: "Scales",
+    to: "/scales",
   },
 ];
 

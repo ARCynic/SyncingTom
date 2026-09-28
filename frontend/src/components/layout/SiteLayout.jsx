@@ -1,24 +1,22 @@
 import { Outlet } from "react-router";
-
 import Footer from "./Footer.jsx";
 import Navbar from "./Navbar.jsx";
 
 export default function SiteLayout() {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-[#050708] text-white">
+    <div className="relative flex min-h-screen flex-col bg-[#09090b] text-neutral-200 selection:bg-emerald-500/30 selection:text-emerald-200">
+      
+      {/* Structural Grid Background - Looks like a sequencer timeline or sheet music */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-20 bg-[#050708]"
+        className="pointer-events-none fixed inset-0 -z-20 bg-[#09090b] bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]"
       />
 
+      {/* Subtle vignette to focus the center without looking like an "orb" */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-      >
-        <div className="absolute -left-64 -top-64 h-[700px] w-[700px] rounded-full bg-cyan-400/[0.055] blur-[150px]" />
-        <div className="absolute -bottom-72 -right-64 h-[750px] w-[750px] rounded-full bg-emerald-400/[0.045] blur-[160px]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
-      </div>
+        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_800px_at_50%_10%,transparent_20%,#09090b_100%)]"
+      />
 
       <Navbar />
 
