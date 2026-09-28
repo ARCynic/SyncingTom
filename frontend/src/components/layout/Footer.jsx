@@ -8,7 +8,7 @@ export default function Footer() {
           <p className="whitespace-nowrap text-sm text-white/60">
             © {year}{" "}
             <a
-              href=""
+              href="https://polymathictrail.space"
               className="text-cyan-300 underline-offset-4 hover:text-emerald-200 hover:underline"
               rel="noreferrer"
             >
@@ -20,7 +20,7 @@ export default function Footer() {
 
           <div className="flex items-center gap-3 whitespace-nowrap">
             <SocialIcon
-              href=""
+              href="https://github.com/ARCynic"
               label="GitHub"
               icon={
                 <svg
@@ -39,7 +39,7 @@ export default function Footer() {
             />
 
             <SocialIcon
-              href=""
+              href="https://x.com/Cynically_Stoic"
               label="Twitter"
               icon={
                 <svg
@@ -54,7 +54,7 @@ export default function Footer() {
             />
 
             <SocialIcon
-              href=""
+              href="https://www.instagram.com/arcynic_/"
               label="Instagram"
               icon={
                 <svg

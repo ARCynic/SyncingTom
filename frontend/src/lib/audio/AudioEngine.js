@@ -1,5 +1,6 @@
 import { ClickSynth } from "./ClickSynth.js";
 import { Scheduler } from "./Scheduler.js";
+
 import {
   advanceCursor,
   beatDurationSeconds,
@@ -9,23 +10,31 @@ import {
 
 const START_DELAY_SECONDS = 0.05;
 const EVENT_HISTORY_SECONDS = 0.25;
+const FINAL_BEAT_SETTLE_SECONDS = 0.12;
+
+function cloneMeter(meter) {
+  return {
+    numerator: meter.numerator,
+    denominator: meter.denominator,
+
+    grouping: meter.grouping
+      ? [...meter.grouping]
+      : undefined,
+  };
+}
 
 function cloneSequence(sequence) {
   return sequence.map((item) => ({
     id: item.id,
     repetitions: item.repetitions,
-    meter: {
-      numerator: item.meter.numerator,
-      denominator: item.meter.denominator,
-      grouping: item.meter.grouping
-        ? [...item.meter.grouping]
-        : undefined,
-    },
+    meter: cloneMeter(item.meter),
   }));
 }
 
 function cloneLoopSettings(loopSettings) {
-  return { ...loopSettings };
+  return {
+    ...loopSettings,
+  };
 }
 
 function sequencesEqual(a, b) {
@@ -42,20 +51,115 @@ function sequencesEqual(a, b) {
 
     return (
       item.repetitions === other.repetitions &&
-      item.meter.numerator === other.meter.numerator &&
-      item.meter.denominator === other.meter.denominator &&
-      JSON.stringify(item.meter.grouping ?? []) ===
-        JSON.stringify(other.meter.grouping ?? [])
+      item.meter.numerator ===
+        other.meter.numerator &&
+      item.meter.denominator ===
+        other.meter.denominator &&
+      JSON.stringify(
+        item.meter.grouping ?? [],
+      ) ===
+        JSON.stringify(
+          other.meter.grouping ?? [],
+        )
     );
   });
 }
 
 function loopSettingsEqual(a, b) {
-  return a.mode === b.mode && a.cycles === b.cycles;
+  return (
+    a.mode === b.mode &&
+    a.cycles === b.cycles
+  );
+}
+
+function countBars(sequence) {
+  return sequence.reduce(
+    (total, item) =>
+      total + item.repetitions,
+    0,
+  );
+}
+
+function getBarNumber(
+  sequence,
+  cursor,
+) {
+  let barsBefore = 0;
+
+  for (
+    let index = 0;
+    index < cursor.sequenceIndex;
+    index += 1
+  ) {
+    barsBefore +=
+      sequence[index]?.repetitions ??
+      0;
+  }
+
+  return (
+    barsBefore +
+    cursor.repetitionIndex +
+    1
+  );
+}
+
+function getNextMeter(
+  sequence,
+  cursor,
+  loopSettings,
+) {
+  const currentItem =
+    sequence[cursor.sequenceIndex];
+
+  if (!currentItem) {
+    return null;
+  }
+
+  // Same meter repeats again.
+  if (
+    cursor.repetitionIndex + 1 <
+    currentItem.repetitions
+  ) {
+    return cloneMeter(
+      currentItem.meter,
+    );
+  }
+
+  // Move to next sequence item.
+  const nextItem =
+    sequence[
+      cursor.sequenceIndex + 1
+    ];
+
+  if (nextItem) {
+    return cloneMeter(
+      nextItem.meter,
+    );
+  }
+
+  // End of the sequence.
+  const anotherCycleExists =
+    loopSettings.mode ===
+      "infinite" ||
+    cursor.cycleIndex + 1 <
+      loopSettings.cycles;
+
+  if (!anotherCycleExists) {
+    return null;
+  }
+
+  return sequence[0]
+    ? cloneMeter(
+        sequence[0].meter,
+      )
+    : null;
 }
 
 export class AudioEngine {
-  constructor(config, callbacks = {}) {
+  constructor(
+    config,
+    callbacks = {},
+  ) {
     validatePlaybackConfig(
       config.sequence,
       config.bpm,
@@ -67,25 +171,50 @@ export class AudioEngine {
     this.scheduler = null;
 
     this.config = {
-      sequence: cloneSequence(config.sequence),
+      sequence:
+        cloneSequence(
+          config.sequence,
+        ),
+
       bpm: config.bpm,
-      loopSettings: cloneLoopSettings(config.loopSettings),
+
+      loopSettings:
+        cloneLoopSettings(
+          config.loopSettings,
+        ),
     };
 
     this.callbacks = callbacks;
-    this.transportState = "stopped";
 
-    this.cursor = createInitialCursor();
+    this.transportState =
+      "stopped";
+
+    this.cursor =
+      createInitialCursor();
+
     this.nextBeatTime = 0;
-    this.pendingCompletionTime = null;
+
+    this.pendingCompletionTime =
+      null;
+
     this.scheduledBeats = [];
+
     this.nextScheduledBeatId = 1;
+
+    // Timers are ONLY for visual
+    // synchronization.
+    // Audio timing remains controlled
+    // by AudioContext.currentTime.
+    this.visualTimerIds =
+      new Set();
 
     this.masterVolume = 0.7;
     this.accentLevel = 0.9;
+
     this.destroyed = false;
 
-    this.scheduleUntil = this.scheduleUntil.bind(this);
+    this.scheduleUntil =
+      this.scheduleUntil.bind(this);
   }
 
   getState() {
@@ -103,24 +232,35 @@ export class AudioEngine {
       config.loopSettings,
     );
 
-    const sequenceChanged = !sequencesEqual(
-      this.config.sequence,
-      config.sequence,
-    );
+    const sequenceChanged =
+      !sequencesEqual(
+        this.config.sequence,
+        config.sequence,
+      );
 
-    const loopSettingsChanged = !loopSettingsEqual(
-      this.config.loopSettings,
-      config.loopSettings,
-    );
+    const loopSettingsChanged =
+      !loopSettingsEqual(
+        this.config.loopSettings,
+        config.loopSettings,
+      );
 
     this.config = {
-      sequence: cloneSequence(config.sequence),
+      sequence:
+        cloneSequence(
+          config.sequence,
+        ),
+
       bpm: config.bpm,
-      loopSettings: cloneLoopSettings(config.loopSettings),
+
+      loopSettings:
+        cloneLoopSettings(
+          config.loopSettings,
+        ),
     };
 
     if (
-      this.transportState === "stopped" ||
+      this.transportState ===
+        "stopped" ||
       sequenceChanged ||
       loopSettingsChanged
     ) {
@@ -129,19 +269,36 @@ export class AudioEngine {
   }
 
   setMasterVolume(value) {
-    this.masterVolume = Math.min(1, Math.max(0, value));
-    this.synth?.setMasterVolume(this.masterVolume);
+    this.masterVolume =
+      Math.min(
+        1,
+        Math.max(0, value),
+      );
+
+    this.synth?.setMasterVolume(
+      this.masterVolume,
+    );
   }
 
   setAccentLevel(value) {
-    this.accentLevel = Math.min(1, Math.max(0, value));
-    this.synth?.setAccentLevel(this.accentLevel);
+    this.accentLevel =
+      Math.min(
+        1,
+        Math.max(0, value),
+      );
+
+    this.synth?.setAccentLevel(
+      this.accentLevel,
+    );
   }
 
   async play() {
     this.assertNotDestroyed();
 
-    if (this.transportState === "playing") {
+    if (
+      this.transportState ===
+      "playing"
+    ) {
       return;
     }
 
@@ -152,40 +309,71 @@ export class AudioEngine {
         this.config.loopSettings,
       );
 
-      const context = await this.ensureAudioContext();
+      const context =
+        await this.ensureAudioContext();
 
-      if (context.state === "suspended") {
+      if (
+        context.state ===
+        "suspended"
+      ) {
         await context.resume();
       }
 
-      if (context.state !== "running") {
-        throw new Error("Audio could not be started in this browser.");
+      if (
+        context.state !==
+        "running"
+      ) {
+        throw new Error(
+          "Audio could not be started in this browser.",
+        );
       }
 
-      this.pendingCompletionTime = null;
-      this.nextBeatTime = context.currentTime + START_DELAY_SECONDS;
+      this.pendingCompletionTime =
+        null;
+
+      this.nextBeatTime =
+        context.currentTime +
+        START_DELAY_SECONDS;
 
       this.setState("playing");
+
       this.scheduler?.start();
     } catch (error) {
       const normalized =
         error instanceof Error
           ? error
-          : new Error("Unable to start audio playback.");
+          : new Error(
+              "Unable to start audio playback.",
+            );
 
-      this.callbacks.onError?.(normalized);
+      this.callbacks.onError?.(
+        normalized,
+      );
+
       throw normalized;
     }
   }
 
   pause() {
-    if (this.transportState !== "playing" || !this.context) {
+    if (
+      this.transportState !==
+        "playing" ||
+      !this.context
+    ) {
       return;
     }
 
     this.scheduler?.stop();
-    this.rewindToFirstCancelledBeat(this.context.currentTime);
-    this.pendingCompletionTime = null;
+
+    this.clearVisualTimers();
+
+    this.rewindToFirstCancelledBeat(
+      this.context.currentTime,
+    );
+
+    this.pendingCompletionTime =
+      null;
+
     this.setState("paused");
   }
 
@@ -195,8 +383,15 @@ export class AudioEngine {
     }
 
     this.scheduler?.stop();
-    this.cancelFutureClicks(this.context?.currentTime ?? 0);
+
+    this.clearVisualTimers();
+
+    this.cancelFutureClicks(
+      this.context?.currentTime ?? 0,
+    );
+
     this.resetPosition();
+
     this.setState("stopped");
   }
 
@@ -204,8 +399,15 @@ export class AudioEngine {
     this.assertNotDestroyed();
 
     this.scheduler?.stop();
-    this.cancelFutureClicks(this.context?.currentTime ?? 0);
+
+    this.clearVisualTimers();
+
+    this.cancelFutureClicks(
+      this.context?.currentTime ?? 0,
+    );
+
     this.resetPosition();
+
     this.setState("stopped");
 
     await this.play();
@@ -219,20 +421,31 @@ export class AudioEngine {
     this.destroyed = true;
 
     this.scheduler?.stop();
-    this.cancelFutureClicks(this.context?.currentTime ?? 0);
+
+    this.clearVisualTimers();
+
+    this.cancelFutureClicks(
+      this.context?.currentTime ?? 0,
+    );
+
     this.synth?.dispose();
 
-    const context = this.context;
+    const context =
+      this.context;
 
     this.scheduler = null;
     this.synth = null;
     this.context = null;
 
-    if (context && context.state !== "closed") {
+    if (
+      context &&
+      context.state !== "closed"
+    ) {
       try {
         await context.close();
       } catch {
-        // Page teardown can interrupt closing.
+        // Page teardown can
+        // interrupt closing.
       }
     }
   }
@@ -242,31 +455,42 @@ export class AudioEngine {
       return this.context;
     }
 
-    if (typeof window === "undefined") {
-      throw new Error("Web Audio is only available in the browser.");
+    if (
+      typeof window ===
+      "undefined"
+    ) {
+      throw new Error(
+        "Web Audio is only available in the browser.",
+      );
     }
 
     const AudioContextConstructor =
-      window.AudioContext ?? window.webkitAudioContext;
+      window.AudioContext ??
+      window.webkitAudioContext;
 
-    if (!AudioContextConstructor) {
+    if (
+      !AudioContextConstructor
+    ) {
       throw new Error(
         "This browser does not support the Web Audio API.",
       );
     }
 
-    const context = new AudioContextConstructor();
+    const context =
+      new AudioContextConstructor();
 
-    const synth = new ClickSynth(
-      context,
-      this.masterVolume,
-      this.accentLevel,
-    );
+    const synth =
+      new ClickSynth(
+        context,
+        this.masterVolume,
+        this.accentLevel,
+      );
 
-    const scheduler = new Scheduler(
-      context,
-      this.scheduleUntil,
-    );
+    const scheduler =
+      new Scheduler(
+        context,
+        this.scheduleUntil,
+      );
 
     this.context = context;
     this.synth = synth;
@@ -275,22 +499,36 @@ export class AudioEngine {
     return context;
   }
 
-  scheduleUntil(scheduleUntil) {
-    const context = this.context;
-    const synth = this.synth;
+  scheduleUntil(
+    scheduleUntil,
+  ) {
+    const context =
+      this.context;
+
+    const synth =
+      this.synth;
 
     if (
       !context ||
       !synth ||
-      this.transportState !== "playing"
+      this.transportState !==
+        "playing"
     ) {
       return;
     }
 
-    this.removeOldScheduledBeats(context.currentTime);
+    this.removeOldScheduledBeats(
+      context.currentTime,
+    );
 
-    if (this.pendingCompletionTime !== null) {
-      if (context.currentTime >= this.pendingCompletionTime) {
+    if (
+      this.pendingCompletionTime !==
+      null
+    ) {
+      if (
+        context.currentTime >=
+        this.pendingCompletionTime
+      ) {
         this.completePlayback();
       }
 
@@ -298,11 +536,18 @@ export class AudioEngine {
     }
 
     while (
-      this.transportState === "playing" &&
-      this.pendingCompletionTime === null &&
-      this.nextBeatTime <= scheduleUntil
+      this.transportState ===
+        "playing" &&
+      this.pendingCompletionTime ===
+        null &&
+      this.nextBeatTime <=
+        scheduleUntil
     ) {
-      const item = this.config.sequence[this.cursor.sequenceIndex];
+      const item =
+        this.config.sequence[
+          this.cursor
+            .sequenceIndex
+        ];
 
       if (!item) {
         this.failPlayback(
@@ -310,6 +555,7 @@ export class AudioEngine {
             "Playback position is outside the meter sequence.",
           ),
         );
+
         return;
       }
 
@@ -317,121 +563,334 @@ export class AudioEngine {
         ...this.cursor,
       };
 
-      const isBarAccent = scheduledCursor.beatIndex === 0;
+      const scheduledTime =
+        this.nextBeatTime;
 
-      const handle = synth.scheduleClick(
-        this.nextBeatTime,
-        isBarAccent,
-      );
+      const isBarAccent =
+        scheduledCursor
+          .beatIndex === 0;
+
+      const handle =
+        synth.scheduleClick(
+          scheduledTime,
+          isBarAccent,
+        );
 
       this.scheduledBeats.push({
-        id: this.nextScheduledBeatId++,
-        time: this.nextBeatTime,
-        cursor: scheduledCursor,
+        id:
+          this.nextScheduledBeatId++,
+
+        time:
+          scheduledTime,
+
+        cursor:
+          scheduledCursor,
+
         isBarAccent,
+
         handle,
       });
 
-      const duration = beatDurationSeconds(
-        this.config.bpm,
-        item.meter.denominator,
-      );
-
-      const advanceResult = advanceCursor(
-        this.config.sequence,
+      // Schedule the UI update
+      // against the same Web Audio
+      // timestamp.
+      this.scheduleVisualBeat(
+        scheduledTime,
         scheduledCursor,
-        this.config.loopSettings,
+        isBarAccent,
       );
 
-      this.nextBeatTime += duration;
+      const duration =
+        beatDurationSeconds(
+          this.config.bpm,
+          item.meter
+            .denominator,
+        );
 
-      if (advanceResult.done) {
-        this.cursor = advanceResult.cursor;
+      const advanceResult =
+        advanceCursor(
+          this.config.sequence,
+          scheduledCursor,
+          this.config
+            .loopSettings,
+        );
 
-        const finalBeat = this.scheduledBeats.at(-1);
+      this.nextBeatTime +=
+        duration;
 
-        if (finalBeat) {
-          this.pendingCompletionTime = finalBeat.time + 0.06;
-        }
+      if (
+        advanceResult.done
+      ) {
+        this.cursor =
+          advanceResult.cursor;
+
+        this.pendingCompletionTime =
+          scheduledTime +
+          FINAL_BEAT_SETTLE_SECONDS;
 
         break;
       }
 
-      this.cursor = advanceResult.cursor;
+      this.cursor =
+        advanceResult.cursor;
     }
   }
 
-  rewindToFirstCancelledBeat(now) {
-    const futureBeats = this.scheduledBeats
-      .filter((beat) => beat.time > now)
-      .sort((a, b) => a.time - b.time);
+  scheduleVisualBeat(
+    when,
+    cursor,
+    isBarAccent,
+  ) {
+    const context =
+      this.context;
 
-    if (futureBeats.length > 0) {
-      this.cursor = {
-        ...futureBeats[0].cursor,
-      };
+    if (
+      !context ||
+      typeof window ===
+        "undefined"
+    ) {
+      return;
     }
 
-    for (const beat of futureBeats) {
-      beat.handle.cancel(now);
+    const item =
+      this.config.sequence[
+        cursor.sequenceIndex
+      ];
+
+    if (!item) {
+      return;
     }
 
-    this.scheduledBeats = this.scheduledBeats.filter(
-      (beat) => beat.time <= now,
+    const payload = {
+      cursor: {
+        ...cursor,
+      },
+
+      meter:
+        cloneMeter(
+          item.meter,
+        ),
+
+      repetitions:
+        item.repetitions,
+
+      isBarAccent,
+
+      audioTime: when,
+
+      barNumber:
+        getBarNumber(
+          this.config.sequence,
+          cursor,
+        ),
+
+      totalBars:
+        countBars(
+          this.config.sequence,
+        ),
+
+      nextMeter:
+        getNextMeter(
+          this.config.sequence,
+          cursor,
+          this.config
+            .loopSettings,
+        ),
+    };
+
+    const delayMs =
+      Math.max(
+        0,
+        (
+          when -
+          context.currentTime
+        ) * 1000,
+      );
+
+    const timerId =
+      window.setTimeout(
+        () => {
+          this.visualTimerIds.delete(
+            timerId,
+          );
+
+          if (
+            this.destroyed ||
+            this.transportState !==
+              "playing"
+          ) {
+            return;
+          }
+
+          this.callbacks.onBeat?.(
+            payload,
+          );
+        },
+        delayMs,
+      );
+
+    this.visualTimerIds.add(
+      timerId,
     );
   }
 
+  clearVisualTimers() {
+    if (
+      typeof window ===
+      "undefined"
+    ) {
+      this.visualTimerIds.clear();
+
+      return;
+    }
+
+    for (
+      const timerId of
+      this.visualTimerIds
+    ) {
+      window.clearTimeout(
+        timerId,
+      );
+    }
+
+    this.visualTimerIds.clear();
+  }
+
+  rewindToFirstCancelledBeat(
+    now,
+  ) {
+    const futureBeats =
+      this.scheduledBeats
+        .filter(
+          (beat) =>
+            beat.time > now,
+        )
+        .sort(
+          (a, b) =>
+            a.time - b.time,
+        );
+
+    if (
+      futureBeats.length > 0
+    ) {
+      this.cursor = {
+        ...futureBeats[0]
+          .cursor,
+      };
+    }
+
+    for (
+      const beat of
+      futureBeats
+    ) {
+      beat.handle.cancel(
+        now,
+      );
+    }
+
+    this.scheduledBeats =
+      this.scheduledBeats.filter(
+        (beat) =>
+          beat.time <= now,
+      );
+  }
+
   cancelFutureClicks(now) {
-    for (const beat of this.scheduledBeats) {
-      if (beat.time > now) {
-        beat.handle.cancel(now);
+    for (
+      const beat of
+      this.scheduledBeats
+    ) {
+      if (
+        beat.time > now
+      ) {
+        beat.handle.cancel(
+          now,
+        );
       }
     }
 
     this.scheduledBeats = [];
   }
 
-  removeOldScheduledBeats(now) {
-    const cutoff = now - EVENT_HISTORY_SECONDS;
+  removeOldScheduledBeats(
+    now,
+  ) {
+    const cutoff =
+      now -
+      EVENT_HISTORY_SECONDS;
 
-    this.scheduledBeats = this.scheduledBeats.filter(
-      (beat) => beat.time >= cutoff,
-    );
+    this.scheduledBeats =
+      this.scheduledBeats.filter(
+        (beat) =>
+          beat.time >= cutoff,
+      );
   }
 
   completePlayback() {
     this.scheduler?.stop();
+
+    this.clearVisualTimers();
+
     this.scheduledBeats = [];
+
     this.resetPosition();
+
     this.setState("stopped");
   }
 
   failPlayback(error) {
     this.scheduler?.stop();
-    this.cancelFutureClicks(this.context?.currentTime ?? 0);
+
+    this.clearVisualTimers();
+
+    this.cancelFutureClicks(
+      this.context?.currentTime ?? 0,
+    );
+
     this.resetPosition();
+
     this.setState("stopped");
-    this.callbacks.onError?.(error);
+
+    this.callbacks.onError?.(
+      error,
+    );
   }
 
   resetPosition() {
-    this.cursor = createInitialCursor();
+    this.cursor =
+      createInitialCursor();
+
     this.nextBeatTime = 0;
-    this.pendingCompletionTime = null;
+
+    this.pendingCompletionTime =
+      null;
+
+    this.callbacks
+      .onPositionReset?.();
   }
 
   setState(nextState) {
-    if (this.transportState === nextState) {
+    if (
+      this.transportState ===
+      nextState
+    ) {
       return;
     }
 
-    this.transportState = nextState;
-    this.callbacks.onStateChange?.(nextState);
+    this.transportState =
+      nextState;
+
+    this.callbacks
+      .onStateChange?.(
+        nextState,
+      );
   }
 
   assertNotDestroyed() {
     if (this.destroyed) {
-      throw new Error("This audio engine has already been destroyed.");
+      throw new Error(
+        "This audio engine has already been destroyed.",
+      );
     }
   }
 }

@@ -5,133 +5,226 @@ import {
   useState,
 } from "react";
 
-import { AudioEngine } from "@/lib/audio/AudioEngine.js";
+import {
+  AudioEngine,
+} from "@/lib/audio/AudioEngine.js";
 
 export function useMeterAudio({
   sequence,
   bpm,
   loopSettings,
 }) {
-  const engineRef = useRef(null);
+  const engineRef =
+    useRef(null);
 
-  const [transportState, setTransportState] = useState("stopped");
-  const [masterVolume, setMasterVolumeState] = useState(0.7);
-  const [accentLevel, setAccentLevelState] = useState(0.9);
-  const [error, setError] = useState(null);
+  const [
+    transportState,
+    setTransportState,
+  ] = useState("stopped");
 
-  const getEngine = useCallback(() => {
-    if (!engineRef.current) {
-      engineRef.current = new AudioEngine(
-        {
-          sequence,
-          bpm,
-          loopSettings,
-        },
-        {
-          onStateChange: setTransportState,
-          onError: (nextError) => setError(nextError.message),
-        },
-      );
-
-      engineRef.current.setMasterVolume(masterVolume);
-      engineRef.current.setAccentLevel(accentLevel);
-    }
-
-    return engineRef.current;
-  }, [
-    accentLevel,
-    bpm,
-    loopSettings,
+  const [
     masterVolume,
-    sequence,
-  ]);
+    setMasterVolumeState,
+  ] = useState(0.7);
 
-  const syncConfig = useCallback(() => {
-    const engine = getEngine();
+  const [
+    accentLevel,
+    setAccentLevelState,
+  ] = useState(0.9);
 
-    engine.setConfig({
-      sequence,
+  const [
+    playbackBeat,
+    setPlaybackBeat,
+  ] = useState(null);
+
+  const [
+    error,
+    setError,
+  ] = useState(null);
+
+  const getEngine =
+    useCallback(() => {
+      if (
+        !engineRef.current
+      ) {
+        engineRef.current =
+          new AudioEngine(
+            {
+              sequence,
+              bpm,
+              loopSettings,
+            },
+
+            {
+              onStateChange:
+                setTransportState,
+
+              onBeat:
+                setPlaybackBeat,
+
+              onPositionReset:
+                () =>
+                  setPlaybackBeat(
+                    null,
+                  ),
+
+              onError:
+                (nextError) =>
+                  setError(
+                    nextError.message,
+                  ),
+            },
+          );
+
+        engineRef.current
+          .setMasterVolume(
+            masterVolume,
+          );
+
+        engineRef.current
+          .setAccentLevel(
+            accentLevel,
+          );
+      }
+
+      return engineRef.current;
+    }, [
+      accentLevel,
       bpm,
       loopSettings,
-    });
+      masterVolume,
+      sequence,
+    ]);
 
-    return engine;
-  }, [
-    bpm,
-    getEngine,
-    loopSettings,
-    sequence,
-  ]);
+  const syncConfig =
+    useCallback(() => {
+      const engine =
+        getEngine();
 
-  const play = useCallback(async () => {
-    setError(null);
+      engine.setConfig({
+        sequence,
+        bpm,
+        loopSettings,
+      });
 
-    try {
-      const engine = syncConfig();
-      await engine.play();
-    } catch (nextError) {
-      setError(
-        nextError instanceof Error
-          ? nextError.message
-          : "Unable to start playback.",
+      return engine;
+    }, [
+      bpm,
+      getEngine,
+      loopSettings,
+      sequence,
+    ]);
+
+  const play =
+    useCallback(async () => {
+      setError(null);
+
+      try {
+        const engine =
+          syncConfig();
+
+        await engine.play();
+      } catch (nextError) {
+        setError(
+          nextError instanceof
+            Error
+            ? nextError.message
+            : "Unable to start playback.",
+        );
+      }
+    }, [syncConfig]);
+
+  const pause =
+    useCallback(() => {
+      engineRef.current?.pause();
+    }, []);
+
+  const stop =
+    useCallback(() => {
+      engineRef.current?.stop();
+    }, []);
+
+  const restart =
+    useCallback(async () => {
+      setError(null);
+
+      try {
+        const engine =
+          syncConfig();
+
+        await engine.restart();
+      } catch (nextError) {
+        setError(
+          nextError instanceof
+            Error
+            ? nextError.message
+            : "Unable to restart playback.",
+        );
+      }
+    }, [syncConfig]);
+
+  const setMasterVolume =
+    useCallback((value) => {
+      const nextValue =
+        Math.min(
+          1,
+          Math.max(0, value),
+        );
+
+      setMasterVolumeState(
+        nextValue,
       );
-    }
-  }, [syncConfig]);
 
-  const pause = useCallback(() => {
-    engineRef.current?.pause();
-  }, []);
+      engineRef.current
+        ?.setMasterVolume(
+          nextValue,
+        );
+    }, []);
 
-  const stop = useCallback(() => {
-    engineRef.current?.stop();
-  }, []);
+  const setAccentLevel =
+    useCallback((value) => {
+      const nextValue =
+        Math.min(
+          1,
+          Math.max(0, value),
+        );
 
-  const restart = useCallback(async () => {
-    setError(null);
-
-    try {
-      const engine = syncConfig();
-      await engine.restart();
-    } catch (nextError) {
-      setError(
-        nextError instanceof Error
-          ? nextError.message
-          : "Unable to restart playback.",
+      setAccentLevelState(
+        nextValue,
       );
-    }
-  }, [syncConfig]);
 
-  const setMasterVolume = useCallback((value) => {
-    const nextValue = Math.min(1, Math.max(0, value));
-
-    setMasterVolumeState(nextValue);
-    engineRef.current?.setMasterVolume(nextValue);
-  }, []);
-
-  const setAccentLevel = useCallback((value) => {
-    const nextValue = Math.min(1, Math.max(0, value));
-
-    setAccentLevelState(nextValue);
-    engineRef.current?.setAccentLevel(nextValue);
-  }, []);
+      engineRef.current
+        ?.setAccentLevel(
+          nextValue,
+        );
+    }, []);
 
   useEffect(() => {
     return () => {
-      const engine = engineRef.current;
-      engineRef.current = null;
+      const engine =
+        engineRef.current;
+
+      engineRef.current =
+        null;
+
       void engine?.destroy();
     };
   }, []);
 
   return {
     transportState,
+    playbackBeat,
+
     masterVolume,
     accentLevel,
+
     error,
+
     play,
     pause,
     stop,
     restart,
+
     setMasterVolume,
     setAccentLevel,
   };

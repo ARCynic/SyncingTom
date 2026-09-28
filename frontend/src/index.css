@@ -64,3 +64,59 @@ button:disabled {
   transform-origin: center;
   will-change: transform, filter;
 }
+@keyframes syncingtom-meter-in {
+  from {
+    opacity: 0.35;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes syncingtom-beat-pop {
+  0% {
+    transform: scale(0.9);
+  }
+
+  55% {
+    transform: scale(1.16);
+  }
+
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+.syncingtom-meter-in {
+  animation:
+    syncingtom-meter-in
+    150ms
+    ease-out;
+}
+
+.syncingtom-beat-pop {
+  animation:
+    syncingtom-beat-pop
+    120ms
+    ease-out;
+}
+
+/* Keep SyncingTom's selection
+   in the purple palette too. */
+::selection {
+  background: rgba(192, 132, 252, 0.3);
+  color: white;
+}
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .syncingtom-meter-in,
+  .syncingtom-beat-pop {
+    animation: none;
+  }
+}
