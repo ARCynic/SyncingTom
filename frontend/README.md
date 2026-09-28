@@ -1,71 +1,135 @@
-# SyncingTom
+# SyncingTom — Checkpoint 2
 
-Browser-first music utilities. The first tool is **Meter Sequence**, a programmable changing-meter click track.
+SyncingTom is a browser-based rhythm utility project.
 
-## Stack
+This version contains the complete Checkpoint 1 + Checkpoint 2 implementation:
 
-- Next.js 16 / App Router
-- React 19
-- TypeScript
+- meter sequence editor
+- quick sequence parser
+- BPM controls
+- infinite / fixed cycle settings
+- accurate Web Audio click scheduling
+- bar-start accent
+- volume and accent controls
+- Play / Pause / Stop / Restart
+- Space-bar transport shortcut
+- responsive site shell
+- React Router navigation
+- navbar and footer
+- Home and Meter Sequence routes
+
+## Fixed stack moving forward
+
+The project is now standardized on:
+
+- Vite
+- React
+- React Router
 - Tailwind CSS
-- Motion for React
 - Web Audio API
+- JavaScript / JSX source
 
-No database, authentication, or backend is required for the core music tools.
+There is no Next.js layer and no TypeScript requirement.
 
-## Local setup
+The `.js` / `.jsx` source is intentionally free of TypeScript-only syntax. TypeScript can be introduced later for selected modules without changing the application architecture.
 
-Node.js 22 is recommended (`.nvmrc` is included).
+## Requirements
+
+Node 22.13+.
 
 ```bash
+nvm use
 npm install
 npm run dev
 ```
 
-Then open `http://localhost:3000`.
+Open:
 
-Useful checks:
+```text
+http://localhost:5173
+```
+
+Meter Sequence:
+
+```text
+http://localhost:5173/tools/meter-sequence
+```
+
+## Build checks
 
 ```bash
 npm run lint
-npm run typecheck
 npm run build
+npm run preview
 ```
+
+## Important migration cleanup
+
+If replacing an older SyncingTom scaffold, remove these if they still exist:
+
+```text
+next.config.*
+next-env.d.ts
+src/app/
+tsconfig.json
+tsconfig.app.json
+tsconfig.node.json
+postcss.config.*
+```
+
+This project uses Tailwind's Vite plugin, so the old PostCSS setup is not needed.
 
 ## Structure
 
 ```text
 src/
-├── app/
-│   ├── page.tsx
-│   └── tools/
-│       └── meter-sequence/
-│           └── page.tsx
+├── App.jsx
+├── main.jsx
+├── index.css
 ├── components/
-│   ├── meter-sequence/
-│   └── shared/
+│   ├── layout/
+│   │   ├── Footer.jsx
+│   │   ├── Navbar.jsx
+│   │   └── SiteLayout.jsx
+│   └── meter-sequence/
+│       ├── BPMControl.jsx
+│       ├── LoopControls.jsx
+│       ├── MeterSequenceEditor.jsx
+│       ├── MeterSequenceTool.jsx
+│       ├── PlaybackPanel.jsx
+│       └── QuickSequenceInput.jsx
+├── hooks/
+│   └── useMeterAudio.js
 ├── lib/
 │   ├── audio/
+│   │   ├── AudioEngine.js
+│   │   ├── ClickSynth.js
+│   │   ├── Scheduler.js
+│   │   └── timing.js
 │   └── meter/
-└── types/
-    └── music.ts
+│       ├── parser.js
+│       └── sequence.js
+└── pages/
+    ├── HomePage.jsx
+    ├── MeterSequencePage.jsx
+    └── NotFoundPage.jsx
 ```
 
-## Checkpoint status
+## Routing
 
-- [x] 1. Meter engine + editable UI
-- [x] 2. Accurate Web Audio playback
-- [ ] 3. Playback visualization + UX
-- [ ] 4. Grouping accents + tempo ladder
-- [ ] 5. Presets + shareable URLs + production polish
+React Router owns navigation.
 
-## Architecture rule
+```text
+/                        Home
+/tools/meter-sequence    Meter Sequence
+```
 
-Keep these layers separate:
+`SiteLayout.jsx` wraps route content with the shared navbar and footer.
 
-- `lib/meter`: pure music/meter logic
-- `lib/audio`: browser audio scheduling/synthesis
-- `components`: React UI
-- `types`: shared TypeScript contracts
+## Timing architecture
 
-This keeps the core reusable for future SyncingTom tools such as Polymeter and Polyrhythm.
+React does not fire the musical clicks.
+
+The click engine uses `AudioContext.currentTime` and schedules audio ahead of time. A short JavaScript timer only wakes the scheduler so it can fill the next scheduling window.
+
+This engine is kept separate from the UI so later tools can reuse it.
