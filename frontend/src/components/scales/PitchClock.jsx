@@ -36,7 +36,23 @@ function pointOnCircle(
 function getMarkerAppearance({
   isActive,
   isRoot,
+  isPlaying,
 }) {
+  if (isPlaying) {
+    return {
+      fill:
+        "color-mix(in srgb, var(--scale-accent-2) 32%, #09090b)",
+
+      stroke:
+        "var(--scale-accent-2)",
+
+      text:
+        "#ffffff",
+
+      strokeWidth: 3.2,
+    };
+  }
+
   if (isRoot) {
     return {
       fill:
@@ -84,11 +100,20 @@ function createAriaLabel(
   position,
   isActive,
   isRoot,
+  isPlaying,
 ) {
   const states = [];
 
+  if (isPlaying) {
+    states.push(
+      "currently playing",
+    );
+  }
+
   if (isRoot) {
-    states.push("root note");
+    states.push(
+      "root note",
+    );
   }
 
   if (isActive) {
@@ -107,15 +132,42 @@ function createAriaLabel(
   ].join(", ");
 }
 
+function buildClockPositions(
+  rootPitchClass,
+) {
+  const clockRoot =
+    rootPitchClass ?? 0;
+
+  return Array.from(
+    {
+      length: 12,
+    },
+    (_, index) => {
+      const pitchClass =
+        (
+          clockRoot +
+          index
+        ) % 12;
+
+      return PITCH_CLOCK_POSITIONS[
+        pitchClass
+      ];
+    },
+  );
+}
+
 export function PitchClock({
   activePitchClasses = [],
   rootPitchClass = null,
+  playbackPitchClass = null,
   onPitchSelect = null,
   className = "",
 }) {
   const activeSet = new Set(
     activePitchClasses
-      .map(normalizePitchClass)
+      .map(
+        normalizePitchClass,
+      )
       .filter(
         (value) =>
           value !== null,
@@ -125,6 +177,25 @@ export function PitchClock({
   const normalizedRoot =
     normalizePitchClass(
       rootPitchClass,
+    );
+
+  const normalizedPlaybackPitch =
+    normalizePitchClass(
+      playbackPitchClass,
+    );
+
+  /*
+   * Rotate the visual clock so
+   * the selected root is always
+   * at 12 o'clock.
+   *
+   * Pitch-class values remain
+   * absolute. Only their visual
+   * positions change.
+   */
+  const clockPositions =
+    buildClockPositions(
+      normalizedRoot,
     );
 
   const interactive =
@@ -172,10 +243,7 @@ export function PitchClock({
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         role="img"
-        aria-labelledby="
-          pitch-clock-title
-          pitch-clock-description
-        "
+        aria-labelledby="pitch-clock-title pitch-clock-description"
         className="
           block
           h-auto
@@ -184,15 +252,18 @@ export function PitchClock({
         "
       >
         <title id="pitch-clock-title">
-          Chromatic pitch clock
+          Root-relative pitch clock
         </title>
 
         <desc id="pitch-clock-description">
           Twelve pitch classes
           arranged around a circle
           in chromatic order, with
-          C at twelve o'clock.
-          Each pitch can be selected
+          the selected root at
+          twelve o'clock. The
+          currently playing pitch
+          is highlighted. Each
+          pitch can be selected
           with a mouse, touch,
           Enter, or Space.
         </desc>
@@ -257,7 +328,7 @@ export function PitchClock({
         />
 
         {/* Clock ticks */}
-        {PITCH_CLOCK_POSITIONS.map(
+        {clockPositions.map(
           (
             position,
             index,
@@ -307,7 +378,7 @@ export function PitchClock({
         )}
 
         {/* Pitch markers */}
-        {PITCH_CLOCK_POSITIONS.map(
+        {clockPositions.map(
           (
             position,
             index,
@@ -333,10 +404,17 @@ export function PitchClock({
               normalizedRoot ===
                 position.pitchClass;
 
+            const isPlaying =
+              normalizedPlaybackPitch !==
+                null &&
+              normalizedPlaybackPitch ===
+                position.pitchClass;
+
             const appearance =
               getMarkerAppearance({
                 isActive,
                 isRoot,
+                isPlaying,
               });
 
             const ariaLabel =
@@ -344,6 +422,7 @@ export function PitchClock({
                 position,
                 isActive,
                 isRoot,
+                isPlaying,
               );
 
             function handleActivate() {
@@ -407,8 +486,7 @@ export function PitchClock({
                     : undefined
                 }
               >
-                {/* Larger invisible
-                    interaction target */}
+                {/* Larger invisible interaction target */}
                 {interactive ? (
                   <circle
                     cx={point.x}
@@ -422,6 +500,25 @@ export function PitchClock({
                   />
                 ) : null}
 
+                {/* Playback halo */}
+                {isPlaying ? (
+                  <circle
+                    cx={point.x}
+                    cy={point.y}
+                    r={
+                      MARKER_RADIUS +
+                      7
+                    }
+                    fill="none"
+                    stroke="var(--scale-accent-2)"
+                    strokeWidth="2"
+                    opacity="0.5"
+                    pointerEvents="none"
+                    className="pitch-clock-playback-ring"
+                  />
+                ) : null}
+
+                {/* Visible pitch marker */}
                 <circle
                   cx={point.x}
                   cy={point.y}
@@ -437,7 +534,14 @@ export function PitchClock({
                   strokeWidth={
                     appearance.strokeWidth
                   }
-                  className="pitch-clock-marker"
+                  className={[
+                    "pitch-clock-marker",
+                    isPlaying
+                      ? "pitch-clock-marker-playing"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   pointerEvents="none"
                 />
 
@@ -548,7 +652,7 @@ export function PitchClock({
         "
       >
         Select any chromatic
-        pitch · C fixed at
+        pitch · Root fixed at
         12 o’clock
       </figcaption>
     </figure>

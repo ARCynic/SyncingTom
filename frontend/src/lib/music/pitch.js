@@ -307,3 +307,87 @@ export function formatFrequency(
     fractionDigits,
   )} Hz`;
 }
+export function buildAscendingMidiSequence(
+  noteNames,
+  startOctave = DEFAULT_AUDITION_OCTAVE,
+  {
+    repeatRootAtOctave = true,
+  } = {},
+) {
+  if (!Array.isArray(noteNames)) {
+    throw new Error(
+      "Note names must be an array.",
+    );
+  }
+
+  if (noteNames.length === 0) {
+    return [];
+  }
+
+  assertOctave(startOctave);
+
+  const firstMidi =
+    noteNameToMidi(
+      noteNames[0],
+      startOctave,
+    );
+
+  const result = [
+    firstMidi,
+  ];
+
+  let previousMidi =
+    firstMidi;
+
+  for (
+    let index = 1;
+    index < noteNames.length;
+    index += 1
+  ) {
+    const parsed =
+      parsePitchName(
+        noteNames[index],
+      );
+
+    let candidate =
+      pitchClassToMidi(
+        parsed.pitchClass,
+        startOctave,
+      );
+
+    while (
+      candidate <=
+      previousMidi
+    ) {
+      candidate += 12;
+    }
+
+    assertMidi(
+      candidate,
+    );
+
+    result.push(
+      candidate,
+    );
+
+    previousMidi =
+      candidate;
+  }
+
+  if (
+    repeatRootAtOctave
+  ) {
+    const octaveRoot =
+      firstMidi + 12;
+
+    assertMidi(
+      octaveRoot,
+    );
+
+    result.push(
+      octaveRoot,
+    );
+  }
+
+  return result;
+}

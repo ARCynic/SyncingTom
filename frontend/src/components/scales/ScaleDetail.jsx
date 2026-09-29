@@ -1,11 +1,11 @@
 import {
-  PitchClock,
-} from "./PitchClock.jsx";
-
-import {
   useEffect,
   useState,
 } from "react";
+
+import {
+  useScaleAudio,
+} from "@/hooks/useScaleAudio.js";
 
 import {
   DEFAULT_AUDITION_OCTAVE,
@@ -19,8 +19,8 @@ import {
 } from "@/lib/scales/buildScale.js";
 
 import {
-  noteNamesToPitchClasses,
   noteNameToPitchClass,
+  noteNamesToPitchClasses,
 } from "@/lib/scales/pitchClasses.js";
 
 import {
@@ -32,49 +32,80 @@ import {
   displayNoteName,
 } from "@/lib/scales/notes.js";
 
+import {
+  PitchClock,
+} from "./PitchClock.jsx";
+
+import {
+  ScalePlaybackControls,
+} from "./ScalePlaybackControls.jsx";
+
 export function ScaleDetail({
   scale,
   root,
   allScales,
   onScaleSelect,
 }) {
-    const [ selectedPitch, setSelectedPitch,] = useState(null);
+  const [
+    selectedPitch,
+    setSelectedPitch,
+  ] = useState(null);
+
   const notes =
     buildScaleNotes(
       root,
       scale,
     );
-  
 
   const activePitchClasses =
     noteNamesToPitchClasses(
       notes,
-  );
+    );
 
   const rootPitchClass =
     noteNameToPitchClass(
       root,
-  );
-  useEffect(() => {
-  setSelectedPitch(null);
-}, [
-  root,
-  scale.id,
-]);
-    const selectedMidi =
-  selectedPitch
-    ? pitchClassToMidi(
-        selectedPitch.pitchClass,
-        DEFAULT_AUDITION_OCTAVE,
-      )
-    : null;
+    );
 
-const selectedFrequency =
-  selectedMidi !== null
-    ? midiToFrequency(
-        selectedMidi,
-      )
-    : null;
+  const {
+  instrumentId,
+  transportState,
+  playbackPitchClass,
+  error: audioError,
+
+  playPitchClass,
+  playScale,
+  stop,
+
+  setInstrumentId,
+} = useScaleAudio({
+  notes,
+});
+
+  useEffect(() => {
+    setSelectedPitch(null);
+
+    stop();
+  }, [
+    root,
+    scale.id,
+    stop,
+  ]);
+
+  const selectedMidi =
+    selectedPitch
+      ? pitchClassToMidi(
+          selectedPitch.pitchClass,
+          DEFAULT_AUDITION_OCTAVE,
+        )
+      : null;
+
+  const selectedFrequency =
+    selectedMidi !== null
+      ? midiToFrequency(
+          selectedMidi,
+        )
+      : null;
 
   const relationship =
     describeModeRelationship(
@@ -87,6 +118,18 @@ const selectedFrequency =
       scale,
       allScales,
     );
+
+  function handlePitchSelect(
+    pitch,
+  ) {
+    setSelectedPitch(
+      pitch,
+    );
+
+    void playPitchClass(
+      pitch.pitchClass,
+    );
+  }
 
   return (
     <section
@@ -102,6 +145,7 @@ const selectedFrequency =
         lg:p-8
       "
     >
+      {/* Scale header */}
       <div>
         <p
           className="
@@ -131,6 +175,7 @@ const selectedFrequency =
           {displayNoteName(
             root,
           )}{" "}
+
           <span className="scale-gradient-text">
             {scale.name}
           </span>
@@ -162,152 +207,183 @@ const selectedFrequency =
           {scale.description}
         </p>
       </div>
+
+      {/* Pitch clock */}
       <div className="mt-10">
-  <div
-    className="
-      mb-5
-      flex
-      flex-col
-      gap-1
-    "
-  >
-    <p
-      className="
-        text-xs
-        font-bold
-        uppercase
-        tracking-[0.18em]
-        text-white/30
-      "
-    >
-      Pitch clock
-    </p>
-
-    <p
-      className="
-        text-sm
-        text-white/35
-      "
-    >
-      Twelve chromatic pitch
-      classes arranged like a
-      clock face.
-    </p>
-  </div>
-
-  <div
-    className="
-      rounded-[2rem]
-      border
-      border-white/[0.07]
-      bg-white/[0.012]
-      px-3
-      py-6
-      sm:px-6
-      sm:py-8
-    "
-  >
-    <PitchClock
-  activePitchClasses={
-    activePitchClasses
-  }
-  rootPitchClass={
-    rootPitchClass
-  }
-  onPitchSelect={
-    setSelectedPitch
-  }
-/>
         <div
-  className="
-    mx-auto
-    mt-5
-    min-h-16
-    max-w-md
-    text-center
-  "
->
-  {selectedPitch ? (
-    <div
-      role="status"
-      aria-live="polite"
-    >
-      <p
-        className="
-          text-sm
-          text-white/55
-        "
-      >
-        Selected{" "}
-
-        <strong
           className="
-            font-semibold
-            text-cyan-200
+            mb-5
+            flex
+            flex-col
+            gap-1
           "
         >
-          {
-            selectedPitch.primary
-          }
+          <p
+            className="
+              text-xs
+              font-bold
+              uppercase
+              tracking-[0.18em]
+              text-white/30
+            "
+          >
+            Pitch clock
+          </p>
 
-          {selectedPitch.secondary
-            ? ` / ${selectedPitch.secondary}`
-            : ""}
-        </strong>
+          <p
+            className="
+              text-sm
+              text-white/35
+            "
+          >
+            Twelve chromatic pitch
+            classes arranged like a
+            clock face.
+          </p>
+        </div>
 
-        {" · "}
+        <div
+          className="
+            rounded-[2rem]
+            border
+            border-white/[0.07]
+            bg-white/[0.012]
+            px-3
+            py-6
+            sm:px-6
+            sm:py-8
+          "
+        >
+          <PitchClock
+              activePitchClasses={
+                activePitchClasses
+              }
+              rootPitchClass={
+                rootPitchClass
+              }
+              playbackPitchClass={
+                playbackPitchClass
+              }
+              onPitchSelect={
+                handlePitchSelect
+              }
+          />
 
-        {selectedPitch.isRoot
-          ? "Root"
-          : selectedPitch.isScaleTone
-            ? "Scale tone"
-            : "Outside the scale"}
-      </p>
+          {/* Selected pitch */}
+          <div
+            className="
+              mx-auto
+              mt-5
+              min-h-16
+              max-w-md
+              text-center
+            "
+          >
+            {selectedPitch ? (
+              <div
+                role="status"
+                aria-live="polite"
+              >
+                <p
+                  className="
+                    text-sm
+                    text-white/55
+                  "
+                >
+                  Selected{" "}
 
-      <p
-        className="
-          mt-2
-          font-mono
-          text-xs
-          tracking-wide
-          text-white/30
-        "
-      >
-        Octave{" "}
-        {
-          DEFAULT_AUDITION_OCTAVE
-        }
+                  <strong
+                    className="
+                      font-semibold
+                      text-cyan-200
+                    "
+                  >
+                    {
+                      selectedPitch.primary
+                    }
 
-        {" · "}
+                    {selectedPitch.secondary
+                      ? ` / ${selectedPitch.secondary}`
+                      : ""}
+                  </strong>
 
-        MIDI{" "}
-        {
-          selectedMidi
-        }
+                  {" · "}
 
-        {" · "}
+                  {selectedPitch.isRoot
+                    ? "Root"
+                    : selectedPitch.isScaleTone
+                      ? "Scale tone"
+                      : "Outside the scale"}
+                </p>
 
-        {
-          formatFrequency(
-            selectedFrequency,
-          )
-        }
-      </p>
-    </div>
-  ) : (
-    <p
-      className="
-        text-xs
-        text-white/25
-      "
-    >
-      Select a pitch on the clock.
-    </p>
-  )}
-</div>
-  </div>
-</div>
+                <p
+                  className="
+                    mt-2
+                    font-mono
+                    text-xs
+                    tracking-wide
+                    text-white/30
+                  "
+                >
+                  Octave{" "}
+                  {
+                    DEFAULT_AUDITION_OCTAVE
+                  }
 
+                  {" · "}
+
+                  MIDI{" "}
+                  {
+                    selectedMidi
+                  }
+
+                  {" · "}
+
+                  {
+                    formatFrequency(
+                      selectedFrequency,
+                    )
+                  }
+                </p>
+              </div>
+            ) : (
+              <p
+                className="
+                  text-xs
+                  text-white/25
+                "
+              >
+                Select a pitch on
+                the clock.
+              </p>
+            )}
+          </div>
+
+          {/* Scale playback */}
+          <ScalePlaybackControls
+            instrumentId={
+              instrumentId
+            }
+            transportState={
+              transportState
+            }
+            error={
+              audioError
+            }
+            onInstrumentChange={
+              setInstrumentId
+            }
+            onPlay={
+              playScale
+            }
+            onStop={
+              stop
+            }
+          />
+        </div>
+      </div>
+
+      {/* Notes */}
       <div className="mt-8">
         <p
           className="
@@ -330,7 +406,10 @@ const selectedFrequency =
           "
         >
           {notes.map(
-            (note, index) => (
+            (
+              note,
+              index,
+            ) => (
               <div
                 key={`${note}-${index}`}
                 className="
@@ -369,6 +448,7 @@ const selectedFrequency =
         </div>
       </div>
 
+      {/* Formula / semitones */}
       <div
         className="
           mt-8
@@ -392,6 +472,7 @@ const selectedFrequency =
         />
       </div>
 
+      {/* Relationship */}
       {relationship ? (
         <div
           className="
@@ -436,6 +517,7 @@ const selectedFrequency =
         </div>
       ) : null}
 
+      {/* Sibling modes */}
       <div className="mt-8">
         <p
           className="
@@ -446,7 +528,8 @@ const selectedFrequency =
             text-white/30
           "
         >
-          Other modes in this family
+          Other modes in this
+          family
         </p>
 
         <div
@@ -460,7 +543,9 @@ const selectedFrequency =
           {siblings.map(
             (sibling) => (
               <button
-                key={sibling.id}
+                key={
+                  sibling.id
+                }
                 type="button"
                 onClick={() =>
                   onScaleSelect(
@@ -482,7 +567,9 @@ const selectedFrequency =
                   hover:text-white
                 "
               >
-                {sibling.name}
+                {
+                  sibling.name
+                }
               </button>
             ),
           )}
