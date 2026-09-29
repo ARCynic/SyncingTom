@@ -171,3 +171,51 @@ button:disabled {
     animation: none !important;
   }
 }
+/* =========================================
+   Pitch Clock interactions
+   ========================================= */
+
+.pitch-clock-note {
+  cursor: pointer;
+  outline: none;
+}
+
+.pitch-clock-note
+  .pitch-clock-marker {
+  transition:
+    stroke 120ms ease,
+    stroke-width 120ms ease,
+    filter 120ms ease;
+}
+
+.pitch-clock-note:hover
+  .pitch-clock-marker {
+  stroke: var(--scale-accent);
+  stroke-width: 2.5;
+}
+
+.pitch-clock-note:focus-visible
+  .pitch-clock-marker {
+  stroke: var(--scale-accent);
+  stroke-width: 3;
+  filter:
+    drop-shadow(
+      0 0 7px
+      rgba(103, 232, 249, 0.38)
+    );
+}
+
+.pitch-clock-note:active
+  .pitch-clock-marker {
+  stroke-width: 3.5;
+}
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .pitch-clock-note
+    .pitch-clock-marker {
+    transition: none;
+  }
+}

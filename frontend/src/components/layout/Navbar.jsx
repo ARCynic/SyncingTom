@@ -21,6 +21,10 @@ const items = [
     label: "Scales",
     to: "/scales",
   },
+  {
+    label: "Subdiv Ladder",
+    to: "/subdivision-ladder",
+  },
 ];
 
 const styles = {

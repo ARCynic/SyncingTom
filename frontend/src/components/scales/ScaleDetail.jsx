@@ -3,8 +3,25 @@ import {
 } from "./PitchClock.jsx";
 
 import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  DEFAULT_AUDITION_OCTAVE,
+  formatFrequency,
+  midiToFrequency,
+  pitchClassToMidi,
+} from "@/lib/music/pitch.js";
+
+import {
   buildScaleNotes,
 } from "@/lib/scales/buildScale.js";
+
+import {
+  noteNamesToPitchClasses,
+  noteNameToPitchClass,
+} from "@/lib/scales/pitchClasses.js";
 
 import {
   describeModeRelationship,
@@ -21,11 +38,43 @@ export function ScaleDetail({
   allScales,
   onScaleSelect,
 }) {
+    const [ selectedPitch, setSelectedPitch,] = useState(null);
   const notes =
     buildScaleNotes(
       root,
       scale,
     );
+  
+
+  const activePitchClasses =
+    noteNamesToPitchClasses(
+      notes,
+  );
+
+  const rootPitchClass =
+    noteNameToPitchClass(
+      root,
+  );
+  useEffect(() => {
+  setSelectedPitch(null);
+}, [
+  root,
+  scale.id,
+]);
+    const selectedMidi =
+  selectedPitch
+    ? pitchClassToMidi(
+        selectedPitch.pitchClass,
+        DEFAULT_AUDITION_OCTAVE,
+      )
+    : null;
+
+const selectedFrequency =
+  selectedMidi !== null
+    ? midiToFrequency(
+        selectedMidi,
+      )
+    : null;
 
   const relationship =
     describeModeRelationship(
@@ -158,7 +207,104 @@ export function ScaleDetail({
       sm:py-8
     "
   >
-    <PitchClock />
+    <PitchClock
+  activePitchClasses={
+    activePitchClasses
+  }
+  rootPitchClass={
+    rootPitchClass
+  }
+  onPitchSelect={
+    setSelectedPitch
+  }
+/>
+        <div
+  className="
+    mx-auto
+    mt-5
+    min-h-16
+    max-w-md
+    text-center
+  "
+>
+  {selectedPitch ? (
+    <div
+      role="status"
+      aria-live="polite"
+    >
+      <p
+        className="
+          text-sm
+          text-white/55
+        "
+      >
+        Selected{" "}
+
+        <strong
+          className="
+            font-semibold
+            text-cyan-200
+          "
+        >
+          {
+            selectedPitch.primary
+          }
+
+          {selectedPitch.secondary
+            ? ` / ${selectedPitch.secondary}`
+            : ""}
+        </strong>
+
+        {" · "}
+
+        {selectedPitch.isRoot
+          ? "Root"
+          : selectedPitch.isScaleTone
+            ? "Scale tone"
+            : "Outside the scale"}
+      </p>
+
+      <p
+        className="
+          mt-2
+          font-mono
+          text-xs
+          tracking-wide
+          text-white/30
+        "
+      >
+        Octave{" "}
+        {
+          DEFAULT_AUDITION_OCTAVE
+        }
+
+        {" · "}
+
+        MIDI{" "}
+        {
+          selectedMidi
+        }
+
+        {" · "}
+
+        {
+          formatFrequency(
+            selectedFrequency,
+          )
+        }
+      </p>
+    </div>
+  ) : (
+    <p
+      className="
+        text-xs
+        text-white/25
+      "
+    >
+      Select a pitch on the clock.
+    </p>
+  )}
+</div>
   </div>
 </div>
 

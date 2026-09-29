@@ -12,7 +12,10 @@ const MARKER_RADIUS = 27;
 const TICK_INNER_RADIUS = 108;
 const TICK_OUTER_RADIUS = 119;
 
-function pointOnCircle(radius, angleDegrees) {
+function pointOnCircle(
+  radius,
+  angleDegrees,
+) {
   const angleRadians =
     (angleDegrees * Math.PI) /
     180;
@@ -38,10 +41,13 @@ function getMarkerAppearance({
     return {
       fill:
         "color-mix(in srgb, var(--scale-accent) 24%, #09090b)",
+
       stroke:
         "var(--scale-accent)",
+
       text:
         "#ffffff",
+
       strokeWidth: 2.4,
     };
   }
@@ -50,27 +56,61 @@ function getMarkerAppearance({
     return {
       fill:
         "color-mix(in srgb, var(--scale-accent) 13%, #09090b)",
+
       stroke:
         "color-mix(in srgb, var(--scale-accent) 78%, transparent)",
+
       text:
         "#e6fbff",
+
       strokeWidth: 1.8,
     };
   }
 
   return {
     fill: "#0d0f11",
+
     stroke:
       "rgba(255,255,255,0.11)",
+
     text:
       "rgba(255,255,255,0.46)",
+
     strokeWidth: 1.25,
   };
+}
+
+function createAriaLabel(
+  position,
+  isActive,
+  isRoot,
+) {
+  const states = [];
+
+  if (isRoot) {
+    states.push("root note");
+  }
+
+  if (isActive) {
+    states.push(
+      "part of the current scale",
+    );
+  } else {
+    states.push(
+      "not part of the current scale",
+    );
+  }
+
+  return [
+    position.spokenLabel,
+    ...states,
+  ].join(", ");
 }
 
 export function PitchClock({
   activePitchClasses = [],
   rootPitchClass = null,
+  onPitchSelect = null,
   className = "",
 }) {
   const activeSet = new Set(
@@ -87,6 +127,39 @@ export function PitchClock({
       rootPitchClass,
     );
 
+  const interactive =
+    typeof onPitchSelect ===
+    "function";
+
+  function activatePitch(
+    position,
+    isActive,
+    isRoot,
+  ) {
+    if (!interactive) {
+      return;
+    }
+
+    onPitchSelect({
+      pitchClass:
+        position.pitchClass,
+
+      primary:
+        position.primary,
+
+      secondary:
+        position.secondary,
+
+      spokenLabel:
+        position.spokenLabel,
+
+      isScaleTone:
+        isActive,
+
+      isRoot,
+    });
+  }
+
   return (
     <figure
       className={[
@@ -99,7 +172,10 @@ export function PitchClock({
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         role="img"
-        aria-labelledby="pitch-clock-title pitch-clock-description"
+        aria-labelledby="
+          pitch-clock-title
+          pitch-clock-description
+        "
         className="
           block
           h-auto
@@ -112,10 +188,13 @@ export function PitchClock({
         </title>
 
         <desc id="pitch-clock-description">
-          Twelve pitch classes arranged
-          around a circle in chromatic
-          order, with C at twelve
-          o'clock.
+          Twelve pitch classes
+          arranged around a circle
+          in chromatic order, with
+          C at twelve o'clock.
+          Each pitch can be selected
+          with a mouse, touch,
+          Enter, or Space.
         </desc>
 
         <defs>
@@ -145,15 +224,16 @@ export function PitchClock({
           </radialGradient>
         </defs>
 
-        {/* Subtle center glow */}
+        {/* Center glow */}
         <circle
           cx={CENTER}
           cy={CENTER}
           r="102"
           fill="url(#pitch-clock-center-glow)"
+          pointerEvents="none"
         />
 
-        {/* Outer chromatic ring */}
+        {/* Outer ring */}
         <circle
           cx={CENTER}
           cy={CENTER}
@@ -161,6 +241,7 @@ export function PitchClock({
           fill="none"
           stroke="rgba(255,255,255,0.08)"
           strokeWidth="1.5"
+          pointerEvents="none"
         />
 
         {/* Inner reference ring */}
@@ -172,13 +253,18 @@ export function PitchClock({
           stroke="rgba(255,255,255,0.045)"
           strokeWidth="1"
           strokeDasharray="3 7"
+          pointerEvents="none"
         />
 
-        {/* 12 clock ticks */}
+        {/* Clock ticks */}
         {PITCH_CLOCK_POSITIONS.map(
-          (position, index) => {
+          (
+            position,
+            index,
+          ) => {
             const angle =
-              -90 + index * 30;
+              -90 +
+              index * 30;
 
             const inner =
               pointOnCircle(
@@ -193,7 +279,8 @@ export function PitchClock({
               );
 
             const isQuarter =
-              index % 3 === 0;
+              index % 3 ===
+              0;
 
             return (
               <line
@@ -213,6 +300,7 @@ export function PitchClock({
                     : 1
                 }
                 strokeLinecap="round"
+                pointerEvents="none"
               />
             );
           },
@@ -220,9 +308,13 @@ export function PitchClock({
 
         {/* Pitch markers */}
         {PITCH_CLOCK_POSITIONS.map(
-          (position, index) => {
+          (
+            position,
+            index,
+          ) => {
             const angle =
-              -90 + index * 30;
+              -90 +
+              index * 30;
 
             const point =
               pointOnCircle(
@@ -236,7 +328,8 @@ export function PitchClock({
               );
 
             const isRoot =
-              normalizedRoot !== null &&
+              normalizedRoot !==
+                null &&
               normalizedRoot ===
                 position.pitchClass;
 
@@ -246,17 +339,95 @@ export function PitchClock({
                 isRoot,
               });
 
+            const ariaLabel =
+              createAriaLabel(
+                position,
+                isActive,
+                isRoot,
+              );
+
+            function handleActivate() {
+              activatePitch(
+                position,
+                isActive,
+                isRoot,
+              );
+            }
+
+            function handleKeyDown(
+              event,
+            ) {
+              if (
+                event.key !==
+                  "Enter" &&
+                event.key !==
+                  " "
+              ) {
+                return;
+              }
+
+              event.preventDefault();
+
+              handleActivate();
+            }
+
             return (
               <g
-                key={position.pitchClass}
+                key={
+                  position.pitchClass
+                }
+                className={
+                  interactive
+                    ? "pitch-clock-note"
+                    : undefined
+                }
+                role={
+                  interactive
+                    ? "button"
+                    : undefined
+                }
+                tabIndex={
+                  interactive
+                    ? 0
+                    : undefined
+                }
                 aria-label={
-                  position.spokenLabel
+                  interactive
+                    ? ariaLabel
+                    : undefined
+                }
+                onClick={
+                  interactive
+                    ? handleActivate
+                    : undefined
+                }
+                onKeyDown={
+                  interactive
+                    ? handleKeyDown
+                    : undefined
                 }
               >
+                {/* Larger invisible
+                    interaction target */}
+                {interactive ? (
+                  <circle
+                    cx={point.x}
+                    cy={point.y}
+                    r={
+                      MARKER_RADIUS +
+                      7
+                    }
+                    fill="transparent"
+                    className="pitch-clock-hit-area"
+                  />
+                ) : null}
+
                 <circle
                   cx={point.x}
                   cy={point.y}
-                  r={MARKER_RADIUS}
+                  r={
+                    MARKER_RADIUS
+                  }
                   fill={
                     appearance.fill
                   }
@@ -266,13 +437,18 @@ export function PitchClock({
                   strokeWidth={
                     appearance.strokeWidth
                   }
+                  className="pitch-clock-marker"
+                  pointerEvents="none"
                 />
 
                 {position.secondary ? (
                   <>
                     <text
                       x={point.x}
-                      y={point.y - 4}
+                      y={
+                        point.y -
+                        4
+                      }
                       textAnchor="middle"
                       dominantBaseline="middle"
                       fill={
@@ -280,13 +456,19 @@ export function PitchClock({
                       }
                       fontSize="13"
                       fontWeight="700"
+                      pointerEvents="none"
                     >
-                      {position.primary}
+                      {
+                        position.primary
+                      }
                     </text>
 
                     <text
                       x={point.x}
-                      y={point.y + 11}
+                      y={
+                        point.y +
+                        11
+                      }
                       textAnchor="middle"
                       dominantBaseline="middle"
                       fill={
@@ -295,14 +477,20 @@ export function PitchClock({
                       opacity="0.72"
                       fontSize="10"
                       fontWeight="600"
+                      pointerEvents="none"
                     >
-                      {position.secondary}
+                      {
+                        position.secondary
+                      }
                     </text>
                   </>
                 ) : (
                   <text
                     x={point.x}
-                    y={point.y + 1}
+                    y={
+                      point.y +
+                      1
+                    }
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fill={
@@ -310,8 +498,11 @@ export function PitchClock({
                     }
                     fontSize="15"
                     fontWeight="700"
+                    pointerEvents="none"
                   >
-                    {position.primary}
+                    {
+                      position.primary
+                    }
                   </text>
                 )}
               </g>
@@ -319,7 +510,7 @@ export function PitchClock({
           },
         )}
 
-        {/* Center label */}
+        {/* Center */}
         <text
           x={CENTER}
           y={CENTER - 8}
@@ -328,6 +519,7 @@ export function PitchClock({
           fontSize="14"
           fontWeight="700"
           letterSpacing="2"
+          pointerEvents="none"
         >
           CHROMATIC
         </text>
@@ -340,6 +532,7 @@ export function PitchClock({
           fontSize="11"
           fontWeight="600"
           letterSpacing="1.5"
+          pointerEvents="none"
         >
           12 PITCH CLASSES
         </text>
@@ -354,7 +547,8 @@ export function PitchClock({
           text-white/30
         "
       >
-        Fixed chromatic layout · C at
+        Select any chromatic
+        pitch · C fixed at
         12 o’clock
       </figcaption>
     </figure>

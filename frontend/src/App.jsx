@@ -5,6 +5,7 @@ import HomePage from "@/pages/HomePage.jsx";
 import MeterSequencePage from "@/pages/meter_sequence/MeterSequencePage.jsx";
 import NotFoundPage from "@/pages/NotFoundPage.jsx";
 import ScaleArchivePage from "@/pages/scales/ScaleArchivePage.jsx";
+import SubdivisionLadderPage from "@/pages/subdivision_ladder/SubdivisionLadderPage.jsx";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route index element={<HomePage />} />
         <Route path="/meter-sequence" element={<MeterSequencePage />} />
         <Route path="/scales" element={<ScaleArchivePage />} />
+        <Route path="/subdivision-ladder" element={<SubdivisionLadderPage />} />
         <Route path="*" element={<NotFoundPage />} />
         
       </Route>

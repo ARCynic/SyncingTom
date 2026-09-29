@@ -1,3 +1,7 @@
+import {
+  parseNoteName,
+} from "./notes.js";
+
 export const PITCH_CLOCK_POSITIONS = [
   {
     pitchClass: 0,
@@ -84,10 +88,42 @@ export const PITCH_CLOCK_POSITIONS = [
   },
 ];
 
-export function normalizePitchClass(value) {
+export function normalizePitchClass(
+  value,
+) {
   if (!Number.isFinite(value)) {
     return null;
   }
 
-  return ((value % 12) + 12) % 12;
+  return (
+    ((value % 12) + 12) %
+    12
+  );
+}
+
+export function noteNameToPitchClass(
+  note,
+) {
+  return parseNoteName(
+    note,
+  ).pitchClass;
+}
+
+export function noteNamesToPitchClasses(
+  notes,
+) {
+  if (!Array.isArray(notes)) {
+    return [];
+  }
+
+  const pitchClasses =
+    notes.map(
+      noteNameToPitchClass,
+    );
+
+  return [
+    ...new Set(
+      pitchClasses,
+    ),
+  ];
 }
