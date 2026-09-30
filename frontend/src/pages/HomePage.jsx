@@ -50,7 +50,17 @@ export default function HomePage() {
                 lg:text-7xl
               "
             >
-              Syncing
+              <span
+                className="
+                  bg-gradient-to-r
+                  from-amber-300
+                  to-purple-300
+                  bg-clip-text
+                  text-transparent
+                "
+              >
+                Syncing
+              </span>
               <span
                 className="
                   bg-gradient-to-r

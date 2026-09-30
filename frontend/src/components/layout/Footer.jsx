@@ -1,24 +1,95 @@
+import {
+  Link,
+} from "react-router";
+
 export default function Footer() {
-  const year = new Date().getFullYear();
+  const year =
+    new Date().getFullYear();
 
   return (
-    <footer className="relative z-20 mt-2 border-t border-white/15 bg-black/60 backdrop-blur-md shadow-[0_-10px_40px_rgba(0,0,0,0.45)]">
-      <div className="mx-auto w-full max-w-screen-2xl px-2 py-6">
-        <div className="flex items-center justify-between gap-6">
-          <p className="whitespace-nowrap text-sm text-white/60">
+    <footer
+      className="
+        relative
+        z-20
+        mt-2
+        border-t
+        border-white/15
+        bg-black/60
+        backdrop-blur-md
+        shadow-[0_-10px_40px_rgba(0,0,0,0.45)]
+      "
+    >
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-screen-2xl
+          px-2
+          py-6
+        "
+      >
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            gap-6
+          "
+        >
+          <p
+            className="
+              whitespace-nowrap
+              text-sm
+              text-white/60
+            "
+          >
             © {year}{" "}
+
             <a
               href="https://polymathictrail.space"
-              className="text-cyan-300 underline-offset-4 hover:text-emerald-200 hover:underline"
+              className="
+                text-cyan-300
+                underline-offset-4
+                hover:text-emerald-200
+                hover:underline
+              "
               rel="noreferrer"
             >
               Polymathic Trail
             </a>
+
             .
-            <span className="hidden sm:inline"> All rights reserved.</span>
+
+            <span className="hidden sm:inline">
+              {" "}
+              All rights reserved.
+            </span>
           </p>
 
-          <div className="flex items-center gap-3 whitespace-nowrap">
+          <div
+            className="
+              flex
+              items-center
+              gap-3
+              whitespace-nowrap
+            "
+          >
+            <Link
+              to="/contact"
+              className="
+                mr-1
+                text-sm
+                font-medium
+                text-white/50
+                underline-offset-4
+                transition
+                hover:text-cyan-200
+                hover:underline
+              "
+            >
+              Contact
+            </Link>
+
             <SocialIcon
               href="https://github.com/ARCynic"
               label="GitHub"
@@ -48,7 +119,9 @@ export default function Footer() {
                   fill="currentColor"
                   aria-hidden="true"
                 >
-                  <path d="M18.9 2H22l-6.77 7.73L23.5 22h-6.7l-5.24-6.44L5.9 22H2.8l7.3-8.34L1 2h6.86l4.74 5.9L18.9 2Zm-1.2 18h1.86L7.74 3.88H5.76L17.7 20Z" />
+                  <path
+                    d="M18.9 2H22l-6.77 7.73L23.5 22h-6.7l-5.24-6.44L5.9 22H2.8l7.3-8.34L1 2h6.86l4.74 5.9L18.9 2Zm-1.2 18h1.86L7.74 3.88H5.76L17.7 20Z"
+                  />
                 </svg>
               }
             />
@@ -63,7 +136,9 @@ export default function Footer() {
                   fill="currentColor"
                   aria-hidden="true"
                 >
-                  <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9ZM12 7.2A4.8 4.8 0 1 1 7.2 12 4.8 4.8 0 0 1 12 7.2Zm0 2A2.8 2.8 0 1 0 14.8 12 2.8 2.8 0 0 0 12 9.2Zm5.3-2.5a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1Z" />
+                  <path
+                    d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9ZM12 7.2A4.8 4.8 0 1 1 7.2 12 4.8 4.8 0 0 1 12 7.2Zm0 2A2.8 2.8 0 1 0 14.8 12 2.8 2.8 0 0 0 12 9.2Zm5.3-2.5a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1Z"
+                  />
                 </svg>
               }
             />
@@ -74,7 +149,11 @@ export default function Footer() {
   );
 }
 
-function SocialIcon({ href, label, icon }) {
+function SocialIcon({
+  href,
+  label,
+  icon,
+}) {
   return (
     <a
       href={href}
