@@ -47,7 +47,7 @@ export const TOOLS = [
     cta: "Open tool",
 
     stamp:
-      "/images/tool-stamps/meter-sequence.webp",
+      "/assets/meter_seq.png",
 
     monogram: "MS",
 
@@ -92,7 +92,7 @@ export const TOOLS = [
     cta: "Open tool",
 
     stamp:
-      "/images/tool-stamps/subdivision-ladder.webp",
+      "/assets/subdiv_lad.png",
 
     monogram: "SL",
 
@@ -132,7 +132,7 @@ export const TOOLS = [
     cta: "Open tool",
 
     stamp:
-      "/images/tool-stamps/polymeter.webp",
+      "/assets/polymeter.png",
 
     monogram: "PM",
 
@@ -172,7 +172,7 @@ export const TOOLS = [
     cta: "Explore scales",
 
     stamp:
-      "/images/tool-stamps/scale-archive.webp",
+      "/assets/scale_archive.png",
 
     monogram: "SA",
 
@@ -214,7 +214,7 @@ export const TOOLS = [
     cta: "Preview tool",
 
     stamp:
-      "/images/tool-stamps/fret-the-scales.webp",
+      "/assets/fret_the_scale.png",
 
     monogram: "FS",
 

@@ -7,13 +7,13 @@ import {
 } from "react-router";
 
 import {
+  AnimatePresence,
   motion,
   useReducedMotion,
 } from "motion/react";
 
 import {
-  TOOL_GROUPS,
-  getToolsForGroup,
+  TOOLS,
 } from "../../data/tools.js";
 
 const cx = (...classes) =>
@@ -21,8 +21,18 @@ const cx = (...classes) =>
     .filter(Boolean)
     .join(" ");
 
-function StampVisual({
+function getToolCategory(
   tool,
+) {
+  return tool.group ===
+    "rhythm"
+    ? "Rhythm / Drums"
+    : "Bass / Guitar";
+}
+
+function ToolStamp({
+  tool,
+  large = false,
 }) {
   const [
     imageFailed,
@@ -32,32 +42,43 @@ function StampVisual({
   if (imageFailed) {
     return (
       <div
-        className="
-          flex
-          h-44
-          w-44
-          items-center
-          justify-center
-          rounded-full
-          border
-          border-white/10
-          bg-black/20
-          text-5xl
-          font-black
-          tracking-[-0.08em]
-          text-white/15
-          sm:h-52
-          sm:w-52
-          lg:h-60
-          lg:w-60
-        "
+        aria-hidden="true"
+        className={cx(
+          `
+            relative
+            flex
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-white/[0.08]
+            bg-white/[0.025]
+            font-black
+            tracking-[-0.08em]
+            text-white/15
+          `,
+          large
+            ? `
+                h-48
+                w-48
+                text-5xl
+                sm:h-56
+                sm:w-56
+                lg:h-64
+                lg:w-64
+              `
+            : `
+                h-20
+                w-20
+                text-2xl
+              `,
+        )}
         style={{
           boxShadow: `
             inset 0 0 60px ${tool.glow},
-            0 0 80px ${tool.glow}
+            0 0 60px ${tool.glow}
           `,
         }}
-        aria-hidden="true"
       >
         {tool.monogram}
       </div>
@@ -71,24 +92,36 @@ function StampVisual({
       aria-hidden="true"
       draggable="false"
       onError={() =>
-        setImageFailed(true)
+        setImageFailed(
+          true,
+        )
       }
-      className="
-        h-full
-        w-full
-        object-contain
-        opacity-80
-        grayscale-[0.15]
-        drop-shadow-[0_20px_60px_rgba(0,0,0,0.65)]
-        transition
-        duration-500
-        ease-out
-        group-hover:scale-[1.035]
-        group-hover:rotate-[1.5deg]
-        group-hover:opacity-100
-        motion-reduce:transform-none
-        motion-reduce:transition-none
-      "
+      className={cx(
+        `
+          relative
+          z-[1]
+          w-full
+          object-contain
+          opacity-90
+          drop-shadow-[0_22px_55px_rgba(0,0,0,0.6)]
+          transition-transform
+          duration-300
+          ease-out
+          group-hover:scale-[1.025]
+          motion-reduce:transform-none
+          motion-reduce:transition-none
+        `,
+        large
+          ? `
+              h-56
+              sm:h-64
+              lg:h-72
+            `
+          : `
+              h-24
+              sm:h-28
+            `,
+      )}
     />
   );
 }
@@ -106,32 +139,32 @@ function StatusBadge({
         `
           inline-flex
           items-center
+          gap-2
           rounded-full
           border
-          px-3
-          py-1.5
-          text-[10px]
+          px-2.5
+          py-1
+          text-[9px]
           font-bold
           uppercase
-          tracking-[0.16em]
+          tracking-[0.14em]
         `,
         preview
           ? `
               border-violet-300/15
               bg-violet-300/[0.05]
-              text-violet-200/65
+              text-violet-200/60
             `
           : `
               border-cyan-300/15
               bg-cyan-300/[0.04]
-              text-cyan-100/60
+              text-cyan-100/55
             `,
       )}
     >
       <span
         className={cx(
           `
-            mr-2
             h-1.5
             w-1.5
             rounded-full
@@ -147,311 +180,426 @@ function StatusBadge({
   );
 }
 
-function ToolCard({
+function CompactToolCard({
   tool,
-  reverse = false,
-  index = 0,
+  index,
+  onExpand,
 }) {
   const reduceMotion =
     useReducedMotion();
 
   return (
-    <Link
-      to={tool.route}
-      aria-label={`${tool.cta}: ${tool.title}`}
+    <motion.button
+      layout
+      type="button"
+      onClick={onExpand}
+      aria-expanded="false"
+      aria-label={`Show details for ${tool.title}`}
+      whileHover={
+        reduceMotion
+          ? undefined
+          : {
+              y: -4,
+            }
+      }
+      whileTap={
+        reduceMotion
+          ? undefined
+          : {
+              scale: 0.99,
+            }
+      }
       className="
         group
-        block
-        rounded-[2rem]
+        relative
+        min-h-[210px]
+        w-full
+        overflow-hidden
+        rounded-[1.6rem]
+        border
+        border-white/[0.08]
+        bg-black/80
+        p-5
+        text-left
+        shadow-[0_18px_55px_rgba(0,0,0,0.28)]
         outline-none
+        transition
+        duration-300
+        hover:border-white/[0.15]
+        hover:shadow-[0_26px_70px_rgba(0,0,0,0.42)]
         focus-visible:ring-2
         focus-visible:ring-cyan-300/50
         focus-visible:ring-offset-4
         focus-visible:ring-offset-black
       "
+      style={{
+        backgroundImage: `
+          radial-gradient(
+            340px circle at 90% 10%,
+            ${tool.glow},
+            transparent 62%
+          )
+        `,
+      }}
     >
-      <motion.article
-        initial={
-          reduceMotion
-            ? false
-            : {
-                opacity: 0,
-                y: 28,
-                scale: 0.985,
-              }
-        }
-        whileInView={{
-          opacity: 1,
-          y: 0,
-          scale: 1,
-        }}
-        viewport={{
-          once: true,
-          amount: 0.2,
-        }}
-        transition={{
-          duration: 0.62,
-          delay:
-            reduceMotion
-              ? 0
-              : Math.min(
-                  index * 0.05,
-                  0.15,
-                ),
-          ease: [
-            0.22,
-            1,
-            0.36,
-            1,
-          ],
-        }}
-        whileHover={
-          reduceMotion
-            ? undefined
-            : {
-                y: -4,
-              }
-        }
+      {/* accent */}
+      <div
+        aria-hidden="true"
         className="
-          relative
-          isolate
-          overflow-hidden
-          rounded-[2rem]
-          border
-          border-white/[0.09]
-          bg-[#050708]/90
-          shadow-[0_22px_80px_rgba(0,0,0,0.34)]
-          transition
-          duration-300
-          group-hover:border-white/[0.16]
-          group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.48)]
-          motion-reduce:transition-none
+          pointer-events-none
+          absolute
+          inset-x-6
+          top-0
+          h-px
+          opacity-40
         "
         style={{
-          backgroundImage: `
-            radial-gradient(
-              650px circle at 88% 50%,
-              ${tool.glow},
-              transparent 58%
-            ),
+          background: `
             linear-gradient(
-              120deg,
-              rgba(255,255,255,0.018),
-              transparent 40%
+              to right,
+              transparent,
+              ${tool.accent},
+              transparent
             )
           `,
         }}
+      />
+
+      {/* decorative geometry */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          -right-10
+          -top-12
+          h-40
+          w-40
+          rounded-full
+          border
+          border-white/[0.025]
+        "
+      />
+
+      <div
+        className="
+          relative
+          z-10
+          flex
+          h-full
+          min-h-[170px]
+          flex-col
+          justify-between
+        "
       >
-        {/* top accent */}
         <div
           className="
-            pointer-events-none
-            absolute
-            inset-x-12
-            top-0
-            h-px
-            opacity-45
-          "
-          style={{
-            background: `
-              linear-gradient(
-                to right,
-                transparent,
-                ${tool.accent},
-                transparent
-              )
-            `,
-          }}
-        />
-
-        {/* faint circular technical marks */}
-        <div
-          className="
-            pointer-events-none
-            absolute
-            -right-20
-            -top-24
-            h-80
-            w-80
-            rounded-full
-            border
-            border-white/[0.025]
-          "
-        />
-
-        <div
-          className="
-            pointer-events-none
-            absolute
-            -right-5
-            -top-10
-            h-56
-            w-56
-            rounded-full
-            border
-            border-white/[0.018]
-          "
-        />
-
-        <div
-          className="
-            grid
-            min-h-[330px]
-            lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)]
+            flex
+            items-start
+            justify-between
+            gap-3
           "
         >
-          {/* Content */}
-          <div
-            className={cx(
-              `
-                relative
-                z-10
-                flex
-                flex-col
-                justify-between
-                px-6
-                py-7
-                sm:px-8
-                sm:py-9
-                lg:px-10
-                lg:py-10
-              `,
-              reverse &&
-                "lg:order-2",
-            )}
+          <div>
+            <p
+              className="
+                font-mono
+                text-[9px]
+                tracking-[0.18em]
+                text-white/20
+              "
+            >
+              {tool.number}
+            </p>
+
+            <p
+              className="
+                mt-1
+                text-[9px]
+                font-bold
+                uppercase
+                tracking-[0.17em]
+                text-white/30
+              "
+            >
+              {getToolCategory(
+                tool,
+              )}
+            </p>
+          </div>
+
+          <span
+            className="
+              flex
+              h-8
+              w-8
+              items-center
+              justify-center
+              rounded-full
+              border
+              border-white/[0.08]
+              bg-white/[0.025]
+              text-lg
+              font-light
+              text-white/35
+              transition
+              group-hover:border-white/[0.16]
+              group-hover:bg-white/[0.05]
+              group-hover:text-white/80
+            "
+            aria-hidden="true"
           >
-            <div>
-              <div
-                className="
-                  flex
-                  flex-wrap
-                  items-center
-                  justify-between
-                  gap-4
-                "
-              >
-                <div
-                  className="
-                    flex
-                    items-center
-                    gap-3
-                  "
-                >
-                  <span
-                    className="
-                      font-mono
-                      text-[11px]
-                      tracking-[0.18em]
-                      text-white/25
-                    "
-                  >
-                    {tool.number}
-                  </span>
+            +
+          </span>
+        </div>
 
-                  <span
-                    className="
-                      h-px
-                      w-7
-                      bg-white/10
-                    "
-                  />
+        <div
+          className="
+            flex
+            items-end
+            justify-between
+            gap-3
+          "
+        >
+          <div
+            className="
+              min-w-0
+              pb-1
+            "
+          >
+            <h3
+              className="
+                text-xl
+                font-semibold
+                tracking-[-0.035em]
+                text-white
+                sm:text-2xl
+              "
+            >
+              {tool.title}
+            </h3>
 
-                  <span
-                    className="
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-[0.2em]
-                      text-white/35
-                    "
-                  >
-                    {tool.group ===
-                    "rhythm"
-                      ? "Rhythm / Drums"
-                      : "Bass / Guitar"}
-                  </span>
-                </div>
-
-                <StatusBadge
-                  tool={tool}
-                />
-              </div>
-
-              <h3
-                className="
-                  mt-8
-                  text-3xl
-                  font-semibold
-                  tracking-[-0.045em]
-                  text-white
-                  sm:text-4xl
-                "
-              >
-                {tool.title}
-              </h3>
-
-              <p
-                className="
-                  mt-4
-                  max-w-2xl
-                  text-sm
-                  leading-7
-                  text-white/52
-                  sm:text-[15px]
-                "
-              >
-                {
-                  tool.description
-                }
-              </p>
-
-              <p
-                className="
-                  mt-4
-                  max-w-2xl
-                  text-sm
-                  leading-7
-                  text-white/32
-                "
-              >
-                {tool.practice}
-              </p>
-
-              <div
-                className="
-                  mt-6
-                  flex
-                  flex-wrap
-                  gap-2
-                "
-              >
-                {tool.tags.map(
-                  (tag) => (
+            <div
+              className="
+                mt-3
+                flex
+                flex-wrap
+                gap-1.5
+              "
+            >
+              {tool.tags
+                .slice(
+                  0,
+                  2,
+                )
+                .map(
+                  (
+                    tag,
+                  ) => (
                     <span
-                      key={tag}
+                      key={
+                        tag
+                      }
                       className="
                         rounded-full
                         border
-                        border-white/[0.07]
-                        bg-white/[0.022]
-                        px-3
-                        py-1.5
-                        text-[11px]
-                        font-medium
-                        tracking-wide
-                        text-white/40
+                        border-white/[0.06]
+                        bg-white/[0.018]
+                        px-2
+                        py-1
+                        text-[9px]
+                        text-white/30
                       "
                     >
                       {tag}
                     </span>
                   ),
                 )}
-              </div>
             </div>
+          </div>
 
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                    y: [
+                      0,
+                      -4,
+                      0,
+                    ],
+                    rotate: [
+                      0,
+                      index %
+                          2 ===
+                        0
+                        ? 1
+                        : -1,
+                      0,
+                    ],
+                  }
+            }
+            transition={{
+              duration:
+                4.5 +
+                index *
+                  0.4,
+
+              repeat:
+                Infinity,
+
+              ease:
+                "easeInOut",
+            }}
+            className="
+              shrink-0
+            "
+          >
+            <ToolStamp
+              tool={tool}
+            />
+          </motion.div>
+        </div>
+      </div>
+    </motion.button>
+  );
+}
+
+function ExpandedToolCard({
+  tool,
+  index,
+  onClose,
+}) {
+  const reduceMotion =
+    useReducedMotion();
+
+  const stampSide =
+    index % 2 === 0
+      ? "right"
+      : "left";
+
+  const stampLeft =
+    stampSide ===
+    "left";
+
+  return (
+    <motion.article
+      layout
+      className="
+        group
+        relative
+        overflow-hidden
+        rounded-[2rem]
+        border
+        border-white/[0.11]
+        bg-black/90
+        shadow-[0_30px_95px_rgba(0,0,0,0.48)]
+      "
+      style={{
+        backgroundImage: `
+          radial-gradient(
+            720px circle at ${
+              stampLeft
+                ? "12%"
+                : "88%"
+            } 30%,
+            ${tool.glow},
+            transparent 58%
+          )
+        `,
+      }}
+    >
+      {/* hover/accent wash */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          opacity-0
+          transition-opacity
+          duration-300
+          group-hover:opacity-100
+        "
+        style={{
+          background: `
+            radial-gradient(
+              700px circle at 15% 0%,
+              ${tool.glow},
+              transparent 55%
+            )
+          `,
+        }}
+      />
+
+      {/* top accent */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-x-10
+          top-0
+          h-px
+          opacity-55
+        "
+        style={{
+          background: `
+            linear-gradient(
+              to right,
+              transparent,
+              ${tool.accent},
+              transparent
+            )
+          `,
+        }}
+      />
+
+      <div
+        className={cx(
+          `
+            relative
+            grid
+            grid-cols-1
+          `,
+
+          stampLeft
+            ? `
+                md:grid-cols-[1fr_1.75fr]
+              `
+            : `
+                md:grid-cols-[1.75fr_1fr]
+              `,
+        )}
+      >
+        {/* TEXT COLUMN */}
+        <div
+          className={cx(
+            `
+              flex
+              flex-col
+              justify-center
+              p-6
+              sm:p-8
+              lg:p-10
+            `,
+
+            stampLeft
+              ? "md:order-2"
+              : "md:order-1",
+          )}
+        >
+          <div
+            className="
+              flex
+              flex-wrap
+              items-center
+              justify-between
+              gap-3
+            "
+          >
             <div
               className="
-                mt-9
                 flex
                 items-center
                 gap-3
@@ -459,125 +607,375 @@ function ToolCard({
             >
               <span
                 className="
-                  text-sm
-                  font-semibold
-                  text-white/75
-                  transition
-                  duration-300
-                  group-hover:text-white
+                  font-mono
+                  text-[10px]
+                  tracking-[0.18em]
+                  text-white/22
                 "
               >
-                {tool.cta}
+                {tool.number}
               </span>
 
               <span
                 className="
-                  text-lg
-                  text-white/30
-                  transition
-                  duration-300
-                  group-hover:translate-x-1
-                  group-hover:text-white/70
-                  motion-reduce:transform-none
-                  motion-reduce:transition-none
+                  h-px
+                  w-6
+                  bg-white/10
                 "
+              />
+
+              <span
+                className="
+                  text-[9px]
+                  font-bold
+                  uppercase
+                  tracking-[0.18em]
+                  text-white/30
+                "
+              >
+                {getToolCategory(
+                  tool,
+                )}
+              </span>
+            </div>
+
+            <StatusBadge
+              tool={tool}
+            />
+          </div>
+
+          <div
+            className="
+              mt-6
+              flex
+              items-start
+              justify-between
+              gap-4
+            "
+          >
+            <h2
+              className="
+                text-3xl
+                font-semibold
+                tracking-[-0.045em]
+                text-white
+                sm:text-4xl
+              "
+            >
+              {tool.title}
+            </h2>
+
+            <button
+              type="button"
+              onClick={
+                onClose
+              }
+              aria-label={`Close ${tool.title}`}
+              className="
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/[0.08]
+                bg-white/[0.025]
+                text-xl
+                text-white/35
+                transition
+                hover:border-white/[0.16]
+                hover:bg-white/[0.06]
+                hover:text-white
+              "
+            >
+              ×
+            </button>
+          </div>
+
+          <p
+            className="
+              mt-5
+              max-w-2xl
+              text-sm
+              leading-7
+              text-white/58
+              sm:text-[15px]
+            "
+          >
+            {tool.description}
+          </p>
+
+          <div
+            className="
+              mt-5
+              rounded-2xl
+              border
+              border-white/[0.065]
+              bg-white/[0.018]
+              p-4
+            "
+          >
+            <p
+              className="
+                text-[9px]
+                font-bold
+                uppercase
+                tracking-[0.18em]
+                text-white/25
+              "
+            >
+              Practice focus
+            </p>
+
+            <p
+              className="
+                mt-2
+                text-sm
+                leading-6
+                text-white/42
+              "
+            >
+              {tool.practice}
+            </p>
+          </div>
+
+          <div
+            className="
+              mt-5
+              flex
+              flex-wrap
+              gap-2
+            "
+          >
+            {tool.tags.map(
+              (
+                tag,
+              ) => (
+                <span
+                  key={tag}
+                  className="
+                    rounded-full
+                    border
+                    border-white/[0.07]
+                    bg-white/[0.02]
+                    px-3
+                    py-1.5
+                    text-[10px]
+                    text-white/38
+                  "
+                >
+                  {tag}
+                </span>
+              ),
+            )}
+          </div>
+
+          <div
+            className="
+              mt-7
+              flex
+              flex-wrap
+              items-center
+              gap-3
+            "
+          >
+            <Link
+              to={tool.route}
+              className="
+                inline-flex
+                min-h-11
+                items-center
+                gap-2
+                rounded-xl
+                border
+                border-white/10
+                bg-white/[0.05]
+                px-4
+                py-2.5
+                text-sm
+                font-semibold
+                text-white/85
+                ring-4
+                ring-white/[0.035]
+                transition
+                hover:bg-white/[0.08]
+                hover:text-white
+                hover:ring-white/[0.06]
+              "
+            >
+              {tool.cta}
+
+              <span
+                className="
+                  text-white/50
+                  transition-transform
+                  group-hover:translate-x-0.5
+                  motion-reduce:transform-none
+                "
+                aria-hidden="true"
               >
                 →
               </span>
-            </div>
-          </div>
+            </Link>
 
-          {/* Stamp */}
-          <div
-            className={cx(
-              `
-                relative
-                flex
-                min-h-64
-                items-center
-                justify-center
-                overflow-hidden
-                px-8
-                py-8
-                lg:min-h-full
-              `,
-              reverse &&
-                "lg:order-1",
-            )}
-          >
-            <div
-              className="
-                pointer-events-none
-                absolute
-                inset-0
-              "
-              style={{
-                background: `
-                  radial-gradient(
-                    circle at center,
-                    ${tool.glow},
-                    transparent 65%
-                  )
-                `,
-              }}
-            />
-
-            <motion.div
-              whileHover={
-                reduceMotion
-                  ? undefined
-                  : {
-                      scale: 1.025,
-                      rotate:
-                        reverse
-                          ? -1.2
-                          : 1.2,
-                    }
+            <button
+              type="button"
+              onClick={
+                onClose
               }
-              transition={{
-                duration: 0.35,
-              }}
               className="
-                relative
-                z-10
-                h-48
-                w-48
-                sm:h-56
-                sm:w-56
-                lg:h-64
-                lg:w-64
+                min-h-11
+                rounded-xl
+                px-3
+                text-sm
+                font-medium
+                text-white/30
+                transition
+                hover:text-white/65
               "
             >
-              <StampVisual
-                tool={tool}
-              />
-            </motion.div>
-
-            <div
-              className="
-                pointer-events-none
-                absolute
-                bottom-5
-                right-6
-                font-mono
-                text-[9px]
-                uppercase
-                tracking-[0.22em]
-                text-white/15
-              "
-            >
-              SyncingTom Practice
-              System
-            </div>
+              Close
+            </button>
           </div>
         </div>
-      </motion.article>
-    </Link>
+
+        {/* STAMP COLUMN */}
+        <div
+          className={cx(
+            `
+              relative
+              flex
+              min-h-60
+              items-center
+              justify-center
+              overflow-hidden
+              p-4
+              sm:min-h-72
+              sm:p-6
+              md:min-h-full
+            `,
+
+            stampLeft
+              ? "md:order-1"
+              : "md:order-2",
+          )}
+        >
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              bg-gradient-to-l
+              from-black/40
+              via-black/10
+              to-transparent
+            "
+          />
+
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              h-64
+              w-64
+              rounded-full
+              border
+              border-white/[0.025]
+            "
+          />
+
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              h-48
+              w-48
+              rounded-full
+              border
+              border-white/[0.02]
+            "
+          />
+
+          <motion.div
+            initial={
+              reduceMotion
+                ? false
+                : {
+                    opacity:
+                      0,
+                    scale:
+                      0.92,
+                    rotate:
+                      stampLeft
+                        ? -2
+                        : 2,
+                  }
+            }
+            animate={{
+              opacity: 1,
+              scale: 1,
+              rotate: 0,
+            }}
+            transition={{
+              duration:
+                reduceMotion
+                  ? 0
+                  : 0.45,
+
+              ease: [
+                0.22,
+                1,
+                0.36,
+                1,
+              ],
+            }}
+            className="
+              relative
+              z-10
+              w-full
+              max-w-[320px]
+            "
+          >
+            <ToolStamp
+              tool={tool}
+              large
+            />
+          </motion.div>
+
+          <span
+            className="
+              pointer-events-none
+              absolute
+              bottom-5
+              right-6
+              font-mono
+              text-[8px]
+              uppercase
+              tracking-[0.2em]
+              text-white/12
+            "
+          >
+            SyncingTom
+          </span>
+        </div>
+      </div>
+    </motion.article>
   );
 }
 
 export default function ToolShowcase() {
-  let cardIndex = 0;
+  const [
+    expandedId,
+    setExpandedId,
+  ] = useState(null);
+
+  const reduceMotion =
+    useReducedMotion();
 
   return (
     <section
@@ -586,181 +984,231 @@ export default function ToolShowcase() {
         relative
         mx-auto
         w-full
-        max-w-7xl
+        max-w-screen-xl
+        scroll-mt-24
         px-4
-        py-16
+        pb-16
+        pt-3
         sm:px-6
-        sm:py-20
+        sm:pb-20
         lg:px-8
-        lg:py-24
       "
     >
-      <header
-        className="
-          max-w-3xl
-        "
-      >
-        <p
-          className="
-            text-[11px]
-            font-bold
-            uppercase
-            tracking-[0.22em]
-            text-cyan-300/70
-          "
-        >
-          Practice Tools
-        </p>
-
-        <h2
-          className="
-            mt-4
-            text-3xl
-            font-semibold
-            tracking-[-0.045em]
-            text-white
-            sm:text-4xl
-            lg:text-5xl
-          "
-        >
-          Built around things worth
-          practising repeatedly.
-        </h2>
-
-        <p
-          className="
-            mt-5
-            max-w-2xl
-            text-sm
-            leading-7
-            text-white/42
-            sm:text-base
-          "
-        >
-          SyncingTom is a collection
-          of small practice systems
-          for drums, bass and guitar.
-          Each tool focuses on one
-          relationship and makes it
-          easier to hear, see, and
-          work with directly.
-        </p>
-      </header>
-
+      {/* HEADER */}
       <div
         className="
-          mt-16
-          space-y-20
+          flex
+          flex-col
+          gap-3
+          border-b
+          border-white/[0.06]
+          pb-5
+          sm:flex-row
+          sm:items-end
+          sm:justify-between
         "
       >
-        {TOOL_GROUPS.map(
-          (group) => {
-            const groupTools =
-              getToolsForGroup(
-                group.id,
-              );
+        <div>
+          <p
+            className="
+              text-[10px]
+              font-bold
+              uppercase
+              tracking-[0.2em]
+              text-cyan-300/55
+            "
+          >
+            Practice Tools
+          </p>
+
+          <h2
+            className="
+              mt-2
+              text-2xl
+              font-semibold
+              tracking-[-0.04em]
+              text-white
+              sm:text-3xl
+            "
+          >
+            What are you working
+            on?
+          </h2>
+        </div>
+
+        <p
+          className="
+            max-w-md
+            text-xs
+            leading-5
+            text-white/27
+            sm:text-right
+          "
+        >
+          Open a card for a quick
+          overview, then jump into
+          the practice tool.
+        </p>
+      </div>
+
+      {/* TOOL GRID */}
+      <motion.div
+        layout
+        className="
+          mt-5
+          grid
+          grid-cols-1
+          gap-4
+          sm:grid-cols-2
+          lg:grid-cols-3
+        "
+      >
+        {TOOLS.map(
+          (
+            tool,
+            index,
+          ) => {
+            const expanded =
+              expandedId ===
+              tool.id;
 
             return (
-              <section
-                key={group.id}
+              <motion.div
+                key={tool.id}
+                layout
+                transition={{
+                  layout: {
+                    duration:
+                      reduceMotion
+                        ? 0
+                        : 0.45,
+
+                    ease: [
+                      0.22,
+                      1,
+                      0.36,
+                      1,
+                    ],
+                  },
+                }}
+                className={cx(
+                  expanded &&
+                    `
+                      sm:col-span-2
+                      lg:col-span-3
+                    `,
+
+                  !expanded &&
+                    index %
+                      3 ===
+                      1 &&
+                    `
+                      lg:translate-y-3
+                    `,
+
+                  !expanded &&
+                    index %
+                      3 ===
+                      2 &&
+                    `
+                      lg:translate-y-1
+                    `,
+                )}
               >
-                <div
-                  className="
-                    grid
-                    gap-4
-                    border-b
-                    border-white/[0.07]
-                    pb-6
-                    lg:grid-cols-[0.7fr_1.3fr]
-                    lg:items-end
-                  "
+                <AnimatePresence
+                  mode="wait"
+                  initial={false}
                 >
-                  <div>
-                    <p
-                      className="
-                        text-[10px]
-                        font-bold
-                        uppercase
-                        tracking-[0.2em]
-                        text-white/28
-                      "
-                    >
-                      {
-                        group.eyebrow
+                  {expanded ? (
+                    <motion.div
+                      key="expanded"
+                      initial={
+                        reduceMotion
+                          ? false
+                          : {
+                              opacity:
+                                0,
+                              scale:
+                                0.99,
+                            }
                       }
-                    </p>
-
-                    <h3
-                      className="
-                        mt-2
-                        text-xl
-                        font-semibold
-                        tracking-[-0.03em]
-                        text-white/85
-                        sm:text-2xl
-                      "
+                      animate={{
+                        opacity:
+                          1,
+                        scale: 1,
+                      }}
+                      exit={{
+                        opacity:
+                          0,
+                        scale:
+                          0.99,
+                      }}
+                      transition={{
+                        duration:
+                          reduceMotion
+                            ? 0
+                            : 0.2,
+                      }}
                     >
-                      {
-                        group.title
+                      <ExpandedToolCard
+                        tool={tool}
+                        index={
+                          index
+                        }
+                        onClose={() =>
+                          setExpandedId(
+                            null,
+                          )
+                        }
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="compact"
+                      initial={
+                        reduceMotion
+                          ? false
+                          : {
+                              opacity:
+                                0,
+                              y: 12,
+                            }
                       }
-                    </h3>
-                  </div>
-
-                  <p
-                    className="
-                      max-w-2xl
-                      text-sm
-                      leading-6
-                      text-white/35
-                      lg:justify-self-end
-                    "
-                  >
-                    {
-                      group.description
-                    }
-                  </p>
-                </div>
-
-                <div
-                  className="
-                    mt-6
-                    space-y-6
-                  "
-                >
-                  {groupTools.map(
-                    (
-                      tool,
-                      index,
-                    ) => {
-                      const currentIndex =
-                        cardIndex;
-
-                      cardIndex += 1;
-
-                      return (
-                        <ToolCard
-                          key={
-                            tool.id
-                          }
-                          tool={tool}
-                          index={
-                            currentIndex
-                          }
-                          reverse={
-                            index %
-                              2 ===
-                            1
-                          }
-                        />
-                      );
-                    },
+                      animate={{
+                        opacity:
+                          1,
+                        y: 0,
+                      }}
+                      exit={{
+                        opacity:
+                          0,
+                      }}
+                      transition={{
+                        duration:
+                          reduceMotion
+                            ? 0
+                            : 0.22,
+                      }}
+                    >
+                      <CompactToolCard
+                        tool={tool}
+                        index={
+                          index
+                        }
+                        onExpand={() =>
+                          setExpandedId(
+                            tool.id,
+                          )
+                        }
+                      />
+                    </motion.div>
                   )}
-                </div>
-              </section>
+                </AnimatePresence>
+              </motion.div>
             );
           },
         )}
-      </div>
+      </motion.div>
     </section>
   );
 }
