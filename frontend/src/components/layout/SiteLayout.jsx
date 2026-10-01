@@ -1,9 +1,12 @@
-import { Outlet } from "react-router";
+import {
+  Outlet,
+} from "react-router";
 
 import FloatingNotes from "@/components/home/FloatingNotes.jsx";
 
 import Footer from "./Footer.jsx";
 import Navbar from "./Navbar.jsx";
+import ScrollToTop from "./ScrollToTop.jsx";
 
 export default function SiteLayout() {
   return (
@@ -21,11 +24,13 @@ export default function SiteLayout() {
         selection:text-purple-100
       "
     >
-      {/* --------------------------------------------------
-          GLOBAL BACKGROUND
-      -------------------------------------------------- */}
+      {/* Reset scroll on route changes */}
+      <ScrollToTop />
 
-      {/* Base background */}
+      {/* --------------------------------
+          GLOBAL BACKGROUND
+      -------------------------------- */}
+
       <div
         aria-hidden="true"
         className="
@@ -37,7 +42,8 @@ export default function SiteLayout() {
         "
       />
 
-      {/* Structural sequencer / sheet grid */}
+      {/* Structural grid */}
+
       <div
         aria-hidden="true"
         className="
@@ -50,7 +56,8 @@ export default function SiteLayout() {
         "
       />
 
-      {/* Global animated musical field */}
+      {/* Floating musical background */}
+
       <FloatingNotes
         count={18}
         className="
@@ -61,7 +68,8 @@ export default function SiteLayout() {
         "
       />
 
-      {/* Soft vignette */}
+      {/* Vignette */}
+
       <div
         aria-hidden="true"
         className="
@@ -73,7 +81,8 @@ export default function SiteLayout() {
         "
       />
 
-      {/* Very subtle lower-page darkness */}
+      {/* Lower darkness */}
+
       <div
         aria-hidden="true"
         className="
@@ -88,9 +97,9 @@ export default function SiteLayout() {
         "
       />
 
-      {/* --------------------------------------------------
+      {/* --------------------------------
           SITE CONTENT
-      -------------------------------------------------- */}
+      -------------------------------- */}
 
       <div
         className="
@@ -103,7 +112,13 @@ export default function SiteLayout() {
       >
         <Navbar />
 
-        <div className="flex flex-1 flex-col">
+        <div
+          className="
+            flex
+            flex-1
+            flex-col
+          "
+        >
           <Outlet />
         </div>
 

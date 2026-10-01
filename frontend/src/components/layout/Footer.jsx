@@ -75,6 +75,43 @@ export default function Footer() {
             "
           >
             <Link
+              to="/about"
+              className="
+                mr-1
+                text-sm
+                font-medium
+                text-white/50
+                underline-offset-4
+                transition
+                hover:text-cyan-200
+                hover:underline
+              "
+            >
+              <span
+                className="
+                  bg-gradient-to-r
+                  from-amber-300
+                  to-purple-300
+                  bg-clip-text
+                  text-transparent
+                "
+              >
+                Syncing
+              </span>
+              
+              <span
+                className="
+                  bg-gradient-to-r
+                  from-purple-300
+                  to-emerald-300
+                  bg-clip-text
+                  text-transparent
+                "
+              >
+                Tom
+              </span>
+            </Link>
+            <Link
               to="/contact"
               className="
                 mr-1
@@ -87,7 +124,17 @@ export default function Footer() {
                 hover:underline
               "
             >
-              Contact
+              <span
+                className="
+                  bg-gradient-to-r
+                  from-emerald-300
+                  to-yellow-300
+                  bg-clip-text
+                  text-transparent
+                "
+              >
+                Contact
+              </span>
             </Link>
 
             <SocialIcon

@@ -614,32 +614,7 @@ export function PitchClock({
           },
         )}
 
-        {/* Center */}
-        <text
-          x={CENTER}
-          y={CENTER - 8}
-          textAnchor="middle"
-          fill="rgba(255,255,255,0.72)"
-          fontSize="14"
-          fontWeight="700"
-          letterSpacing="2"
-          pointerEvents="none"
-        >
-          CHROMATIC
-        </text>
 
-        <text
-          x={CENTER}
-          y={CENTER + 16}
-          textAnchor="middle"
-          fill="rgba(255,255,255,0.28)"
-          fontSize="11"
-          fontWeight="600"
-          letterSpacing="1.5"
-          pointerEvents="none"
-        >
-          12 PITCH CLASSES
-        </text>
       </svg>
 
       <figcaption
@@ -651,9 +626,7 @@ export function PitchClock({
           text-white/30
         "
       >
-        Select any chromatic
-        pitch · Root fixed at
-        12 o’clock
+        Select a note to hear the sound.
       </figcaption>
     </figure>
   );

@@ -15,6 +15,8 @@ html {
   min-width: 320px;
   min-height: 100%;
   background: #050708;
+
+  scroll-behavior: auto;
 }
 
 body {
@@ -22,6 +24,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: #050708;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 button,
