@@ -43,6 +43,10 @@ const items = [
     label: "Polymeter",
     to: "/polymeter",
   },
+  {
+    label: "Fret D Scale",
+    to: "/fret_the_scales",
+  },
 ];
 
 const styles = {

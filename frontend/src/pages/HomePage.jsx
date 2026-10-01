@@ -1,3 +1,6 @@
+import ToolShowcase from "../components/home/ToolShowcase.jsx";
+
+
 export default function HomePage() {
   return (
     <main
@@ -92,7 +95,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
+      <ToolShowcase />
       {/* Reserved for future home modules */}
       <section
         className="
