@@ -1,113 +1,10 @@
-export const TOOL_GROUPS = [
-  {
-    id: "rhythm",
-    eyebrow: "Rhythm / Drums",
-    title: "Time, pulse, and coordination.",
-    description:
-      "Practice tools for hearing rhythmic structure, controlling subdivisions, and staying oriented when patterns begin to pull apart.",
-  },
 
-  {
-    id: "strings",
-    eyebrow: "Bass / Guitar",
-    title: "Pitch under your fingers.",
-    description:
-      "Tools for understanding scales and gradually connecting that knowledge to physical positions across the fretboard.",
-  },
-];
 
-export const TOOLS = [
-  {
-    id: "meter-sequence",
-
-    number: "01",
-
-    group: "rhythm",
-
-    title: "Meter Sequence",
-
-    description:
-      "Build changing meter sequences and practise moving between different bar lengths without losing the underlying pulse.",
-
-    practice:
-      "Useful for internalising meter changes instead of treating each time signature as an isolated exercise.",
-
-    tags: [
-      "Meter changes",
-      "Pulse",
-      "Counting",
-    ],
-
-    route: "/meter-sequence",
-
-    status: "live",
-
-    statusLabel: "Available",
-
-    cta: "Open tool",
-
-    stamp:
-      "/assets/meter_seq.png",
-
-    monogram: "MS",
-
-    accent: "#67e8f9",
-
-    glow:
-      "rgba(103, 232, 249, 0.12)",
-  },
-
-  {
-    id: "subdivision-ladder",
-
-    number: "02",
-
-    group: "rhythm",
-
-    title: "Subdivision Ladder",
-
-    description:
-      "Move through different rhythmic subdivisions while keeping one central tempo steady.",
-
-    practice:
-      "Built for developing timing control when the density of notes changes but the pulse does not.",
-
-    tags: [
-      "Subdivisions",
-      "Timing",
-      "Control",
-    ],
-
-    /*
-     * Change this value if your existing route
-     * uses a different path.
-     */
-    route:
-      "/subdivision-ladder",
-
-    status: "live",
-
-    statusLabel: "Available",
-
-    cta: "Open tool",
-
-    stamp:
-      "/assets/subdiv_lad.png",
-
-    monogram: "SL",
-
-    accent: "#5eead4",
-
-    glow:
-      "rgba(94, 234, 212, 0.11)",
-  },
-
-  {
+export const HOME_TOOLS = [
+    {
     id: "polymeter",
 
-    number: "03",
-
-    group: "rhythm",
+    group: "🎸 🥁",
 
     title: "Polymeter",
 
@@ -117,19 +14,8 @@ export const TOOLS = [
     practice:
       "Explore independent rhythmic cycles without losing the common temporal grid underneath them.",
 
-    tags: [
-      "Independent cycles",
-      "Alignment",
-      "Groove",
-    ],
 
     route: "/polymeter",
-
-    status: "live",
-
-    statusLabel: "Available",
-
-    cta: "Open tool",
 
     stamp:
       "/assets/polymeter.png",
@@ -140,14 +26,15 @@ export const TOOLS = [
 
     glow:
       "rgba(34, 211, 238, 0.11)",
+      stampSide:
+      "left",
   },
-
   {
     id: "scale-archive",
 
-    number: "04",
+    group: "🎸",
 
-    group: "strings",
+    badge: "Pitch",
 
     title: "Scale Archive",
 
@@ -157,37 +44,97 @@ export const TOOLS = [
     practice:
       "A reference and listening space for understanding the scale before turning it into fretboard movement.",
 
-    tags: [
-      "Modes",
-      "Intervals",
-      "Pitch",
-    ],
-
-    route: "/scales",
-
-    status: "live",
-
-    statusLabel: "Available",
-
-    cta: "Explore scales",
+    route:
+      "/scales",
 
     stamp:
       "/assets/scale_archive.png",
 
     monogram: "SA",
 
-    accent: "#93c5fd",
+    accent:
+      "#93c5fd",
 
     glow:
       "rgba(147, 197, 253, 0.11)",
+
+    stampSide:
+      "right",
   },
+  
+  {
+    id: "subdivision-ladder",
+
+    group: "🥁",
+
+
+    title: "Subdivision Ladder",
+
+    description:
+      "Keep the meter and pulse fixed while changing how many notes fit inside each beat.",
+
+    practice:
+      "Design custom ladders such as 1 → 2 → 3 → 4 → 5 → 7 → 8 and train transitions between rhythmic densities without changing tempo.",
+
+    route:
+      "/subdivision-ladder",
+
+    stamp:
+      "/assets/subdiv_lad.png",
+
+    monogram: "SL",
+
+    accent:
+      "#6ee7b7",
+
+    glow:
+      "rgba(110, 231, 183, 0.11)",
+
+    stampSide:
+      "left",
+  },
+
+  {
+    id: "meter-sequence",
+
+    group: "🎸🥁",
+
+    badge: "",
+
+    title: "Meter Sequence",
+
+    description:
+      "Build changing meter sequences and practice moving between time signatures without losing the underlying tempo.",
+
+    practice:
+      "Useful for odd meters, mixed-meter transitions, repeated meter chains and keeping orientation while the bar structure changes.",
+
+    route:
+      "/meter-sequence",
+
+    stamp:
+      "/assets/meter_seq.png",
+
+    monogram: "MS",
+
+    accent:
+      "#c084fc",
+
+    glow:
+      "rgba(192, 132, 252, 0.12)",
+
+    stampSide:
+      "right",
+  },
+
+
+  
 
   {
     id: "fret-the-scales",
 
-    number: "05",
 
-    group: "strings",
+    group: "🎸",
 
     title: "Fret the Scales",
 
@@ -197,21 +144,10 @@ export const TOOLS = [
     practice:
       "Designed around note recall, scale degrees, positions, and eventually moving confidently across the neck.",
 
-    tags: [
-      "Fretboard recall",
-      "Scale degrees",
-      "Positions",
-    ],
 
     route:
       "/fret-the-scales",
 
-    status: "preview",
-
-    statusLabel:
-      "In development",
-
-    cta: "Preview tool",
 
     stamp:
       "/assets/fret_the_scale.png",
@@ -222,14 +158,8 @@ export const TOOLS = [
 
     glow:
       "rgba(196, 181, 253, 0.11)",
+      
+    stampSide:
+      "left",
   },
 ];
-
-export function getToolsForGroup(
-  groupId,
-) {
-  return TOOLS.filter(
-    (tool) =>
-      tool.group === groupId,
-  );
-}
