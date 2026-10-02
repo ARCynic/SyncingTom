@@ -25,7 +25,6 @@ import {
 
 import {
   describeModeRelationship,
-  getSiblingModes,
 } from "@/lib/scales/relationships.js";
 
 import {
@@ -40,12 +39,20 @@ export function ScaleDetail({
   scale,
   root,
   allScales,
-  onScaleSelect,
 }) {
   const [
-    selectedPitch,
-    setSelectedPitch,
-  ] = useState(null);
+  selectedPitchState,
+  setSelectedPitchState,
+] = useState(null);
+
+const selectionKey =
+  `${root}:${scale.id}`;
+
+const selectedPitch =
+  selectedPitchState?.key ===
+  selectionKey
+    ? selectedPitchState.pitch
+    : null;
 
   const notes =
     buildScaleNotes(
@@ -79,14 +86,12 @@ export function ScaleDetail({
   });
 
   useEffect(() => {
-    setSelectedPitch(null);
-
-    stop();
-  }, [
-    root,
-    scale.id,
-    stop,
-  ]);
+  stop();
+}, [
+  root,
+  scale.id,
+  stop,
+]);
 
   const selectedMidi =
     selectedPitch
@@ -109,23 +114,23 @@ export function ScaleDetail({
       allScales,
     );
 
-  const siblings =
-    getSiblingModes(
-      scale,
-      allScales,
-    );
-
-  function handlePitchSelect(
+  // const siblings =
+  //   getSiblingModes(
+  //     scale,
+  //     allScales,
+  //   );
+function handlePitchSelect(
+  pitch,
+) {
+  setSelectedPitchState({
+    key: selectionKey,
     pitch,
-  ) {
-    setSelectedPitch(
-      pitch,
-    );
+  });
 
-    void playPitchClass(
-      pitch.pitchClass,
-    );
-  }
+  void playPitchClass(
+    pitch.pitchClass,
+  );
+}
 
   return (
     <section

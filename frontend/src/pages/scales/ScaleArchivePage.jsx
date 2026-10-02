@@ -59,7 +59,6 @@ export default function ScaleArchivePage() {
 
   const [
     query,
-    setQuery,
   ] = useState("");
 
   const selectedFamily =
@@ -358,17 +357,14 @@ export default function ScaleArchivePage() {
         </section>
 
         <ScaleDetail
-          scale={
-            selectedScale
-          }
-          root={root}
-          allScales={
-            familyScales
-          }
-          onScaleSelect={
-            setSelectedScaleId
-          }
-        />
+  scale={
+    selectedScale
+  }
+  root={root}
+  allScales={
+    familyScales
+  }
+/>
       </div>
     </main>
   );

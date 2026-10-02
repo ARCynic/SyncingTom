@@ -268,36 +268,23 @@ function AmbientWave() {
         </linearGradient>
       </defs>
 
-      <motion.path
-        d="
-          M0 225
-          C130 160 220 290 350 220
-          C480 145 570 280 700 205
-          C830 140 960 265 1200 180
-        "
-        fill="none"
-        stroke="url(#wave-gradient)"
-        strokeWidth="1.5"
+      {/* Main wave — fixed SVG path */}
+      <motion.g
         animate={{
-          d: [
-            `
-              M0 225
-              C130 160 220 290 350 220
-              C480 145 570 280 700 205
-              C830 140 960 265 1200 180
-            `,
-            `
-              M0 205
-              C140 290 230 135 365 215
-              C500 295 600 150 730 225
-              C870 300 980 155 1200 220
-            `,
-            `
-              M0 225
-              C130 160 220 290 350 220
-              C480 145 570 280 700 205
-              C830 140 960 265 1200 180
-            `,
+          x: [
+            0,
+            8,
+            0,
+            -6,
+            0,
+          ],
+
+          y: [
+            0,
+            -10,
+            0,
+            8,
+            0,
           ],
         }}
         transition={{
@@ -305,28 +292,48 @@ function AmbientWave() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-      />
+      >
+        <path
+          d="
+            M0 225
+            C130 160 220 290 350 220
+            C480 145 570 280 700 205
+            C830 140 960 265 1200 180
+          "
+          fill="none"
+          stroke="url(#wave-gradient)"
+          strokeWidth="1.5"
+        />
+      </motion.g>
 
-      <motion.path
-        d="
-          M0 250
-          C180 185 300 305 470 230
-          C640 160 760 290 920 220
-          C1050 170 1130 210 1200 190
-        "
-        fill="none"
-        stroke="url(#wave-gradient)"
-        strokeWidth="0.75"
-        opacity="0.45"
+      {/* Secondary wave */}
+      <motion.g
         animate={{
-          y: [0, -18, 0],
+          y: [
+            0,
+            -18,
+            0,
+          ],
         }}
         transition={{
           duration: 13,
           repeat: Infinity,
           ease: "easeInOut",
         }}
-      />
+      >
+        <path
+          d="
+            M0 250
+            C180 185 300 305 470 230
+            C640 160 760 290 920 220
+            C1050 170 1130 210 1200 190
+          "
+          fill="none"
+          stroke="url(#wave-gradient)"
+          strokeWidth="0.75"
+          opacity="0.45"
+        />
+      </motion.g>
     </motion.svg>
   );
 }

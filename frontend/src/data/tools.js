@@ -1,34 +1,6 @@
 
 
 export const HOME_TOOLS = [
-    {
-    id: "polymeter",
-
-    group: "🎸 🥁",
-
-    title: "Polymeter",
-
-    description:
-      "Layer drum patterns with different cycle lengths over one shared pulse and hear how they separate and realign.",
-
-    practice:
-      "Explore independent rhythmic cycles without losing the common temporal grid underneath them.",
-
-
-    route: "/polymeter",
-
-    stamp:
-      "/assets/polymeter.png",
-
-    monogram: "PM",
-
-    accent: "#22d3ee",
-
-    glow:
-      "rgba(34, 211, 238, 0.11)",
-      stampSide:
-      "left",
-  },
   {
     id: "scale-archive",
 
@@ -59,8 +31,37 @@ export const HOME_TOOLS = [
       "rgba(147, 197, 253, 0.11)",
 
     stampSide:
+      "left",
+  },
+    {
+    id: "polymeter",
+
+    group: "🎸 🥁",
+
+    title: "Polymeter",
+
+    description:
+      "Layer drum patterns with different cycle lengths over one shared pulse and hear how they separate and realign.",
+
+    practice:
+      "Explore independent rhythmic cycles without losing the common temporal grid underneath them.",
+
+
+    route: "/polymeter",
+
+    stamp:
+      "/assets/polymeter.png",
+
+    monogram: "PM",
+
+    accent: "#22d3ee",
+
+    glow:
+      "rgba(34, 211, 238, 0.11)",
+      stampSide:
       "right",
   },
+  
   
   {
     id: "subdivision-ladder",

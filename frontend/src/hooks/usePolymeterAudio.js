@@ -241,30 +241,56 @@ export function usePolymeterAudio({
    * change.
    */
   useEffect(() => {
-    const engine =
-      engineRef.current;
+  const engine =
+    engineRef.current;
 
-    if (!engine) {
-      return;
-    }
+  if (!engine) {
+    return undefined;
+  }
 
-    try {
-      engine.setConfig({
-        bpm,
-        lanes,
-      });
-    } catch (nextError) {
-      setError(
-        nextError instanceof
-          Error
-          ? nextError.message
-          : "Unable to update polymeter configuration.",
+  let errorTimerId = null;
+
+  try {
+    engine.setConfig({
+      bpm,
+      lanes,
+    });
+  } catch (nextError) {
+    const message =
+      nextError instanceof
+        Error
+        ? nextError.message
+        : "Unable to update polymeter configuration.";
+
+    /*
+     * Defer the React state update
+     * so it does not happen
+     * synchronously inside the effect.
+     */
+    errorTimerId =
+      window.setTimeout(
+        () => {
+          setError(
+            message,
+          );
+        },
+        0,
+      );
+  }
+
+  return () => {
+    if (
+      errorTimerId !== null
+    ) {
+      window.clearTimeout(
+        errorTimerId,
       );
     }
-  }, [
-    bpm,
-    lanes,
-  ]);
+  };
+}, [
+  bpm,
+  lanes,
+]);
 
   useEffect(() => {
     return () => {
