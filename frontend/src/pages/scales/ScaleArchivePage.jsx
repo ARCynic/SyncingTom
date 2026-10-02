@@ -4,13 +4,23 @@ import {
 } from "react";
 
 import {
+  SCALE_FAMILIES,
   SCALES,
   getScaleById,
+  getScalesByFamily,
 } from "@/data/scales/index.js";
 
 import {
-  RootSelector,
-} from "@/components/scales/RootSelector.jsx";
+  buildScaleNotes,
+} from "@/lib/scales/buildScale.js";
+
+import {
+  parseNoteName,
+} from "@/lib/scales/notes.js";
+
+import {
+  PianoKeyboard,
+} from "@/components/scales/PianoKeyboard.jsx";
 
 import {
   ScaleCard,
@@ -20,48 +30,86 @@ import {
   ScaleDetail,
 } from "@/components/scales/ScaleDetail.jsx";
 
-const DEFAULT_SCALE = "major";
-const DEFAULT_ROOT = "C";
+const DEFAULT_FAMILY =
+  SCALE_FAMILIES[0]?.id ??
+  "diatonic";
+
+const DEFAULT_SCALE =
+  SCALE_FAMILIES[0]
+    ?.scales[0]?.id ??
+  "major";
+
+const DEFAULT_ROOT =
+  "C";
 
 export default function ScaleArchivePage() {
   const [
     selectedScaleId,
     setSelectedScaleId,
-  ] = useState(DEFAULT_SCALE);
+  ] = useState(
+    DEFAULT_SCALE,
+  );
 
   const [
     root,
     setRoot,
-  ] = useState(DEFAULT_ROOT);
+  ] = useState(
+    DEFAULT_ROOT,
+  );
 
   const [
     query,
     setQuery,
   ] = useState("");
 
+  const selectedFamily =
+    SCALE_FAMILIES.find(
+      (family) =>
+        family.id ===
+        DEFAULT_FAMILY,
+    ) ??
+    SCALE_FAMILIES[0];
+
+  const familyScales =
+    getScalesByFamily(
+      selectedFamily.id,
+    );
+
   const selectedScale =
-    getScaleById(selectedScaleId) ??
+    familyScales.find(
+      (scale) =>
+        scale.id ===
+        selectedScaleId,
+    ) ??
+    familyScales[0] ??
+    getScaleById(
+      selectedScaleId,
+    ) ??
     SCALES[0];
 
   const filteredScales =
     useMemo(() => {
-      const normalized = query
-        .trim()
-        .toLowerCase();
+      const normalized =
+        query
+          .trim()
+          .toLowerCase();
 
       if (!normalized) {
-        return SCALES;
+        return familyScales;
       }
 
-      return SCALES.filter(
+      return familyScales.filter(
         (scale) => {
           const haystack = [
             scale.name,
             scale.modeName,
             scale.family,
-            ...scale.aliases,
-            ...scale.formula,
+            ...(scale.aliases ??
+              []),
+            ...(scale.formula ??
+              []),
           ]
+            .filter(Boolean)
             .join(" ")
             .toLowerCase();
 
@@ -70,7 +118,53 @@ export default function ScaleArchivePage() {
           );
         },
       );
-    }, [query]);
+    }, [
+      familyScales,
+      query,
+    ]);
+
+  const keyboardNotes =
+    useMemo(
+      () =>
+        buildScaleNotes(
+          root,
+          selectedScale,
+        ),
+      [
+        root,
+        selectedScale,
+      ],
+    );
+
+  const activePitchClasses =
+    useMemo(
+      () =>
+        [
+          ...new Set(
+            keyboardNotes.map(
+              (note) =>
+                parseNoteName(
+                  note,
+                )
+                  .pitchClass,
+            ),
+          ),
+        ],
+      [
+        keyboardNotes,
+      ],
+    );
+
+  const rootPitchClass =
+    useMemo(
+      () =>
+        parseNoteName(
+          root,
+        ).pitchClass,
+      [
+        root,
+      ],
+    );
 
   return (
     <main
@@ -81,125 +175,109 @@ export default function ScaleArchivePage() {
         max-w-screen-xl
         flex-1
         px-4
-        py-8
+        pb-8
+        pt-2
         sm:px-6
-        sm:py-12
+        sm:pb-12
+        sm:pt-3
         lg:px-8
       "
     >
+      {/* Page header */}
       <header
         className="
-          mb-8
+          mb-5
           max-w-4xl
-          sm:mb-10
+          sm:mb-6
         "
       >
-        <p
+        <div
           className="
-            text-xs
-            font-semibold
-            uppercase
-            tracking-[0.22em]
-            text-cyan-300/65
+            flex
+            items-center
+            gap-4
           "
         >
-          Music theory archive
-        </p>
+          <img
+            src="/assets/scale_archive.png"
+            alt=""
+            aria-hidden="true"
+            draggable="false"
+            className="
+              h-16
+              w-16
+              shrink-0
+              object-contain
+              opacity-90
+              sm:h-20
+              sm:w-20
+            "
+          />
 
-        <h1
-          className="
-            mt-3
-            text-4xl
-            font-semibold
-            tracking-[-0.04em]
-            text-white
-            sm:text-5xl
-          "
-        >
-          Scale{" "}
-          <span className="scale-gradient-text">
-            Archive
-          </span>
-        </h1>
+          <div>
+            <h1
+              className="
+                text-3xl
+                font-semibold
+                tracking-[-0.04em]
+                text-white
+                sm:text-4xl
+              "
+            >
+              Scale{" "}
 
-        <p
-          className="
-            mt-4
-            max-w-3xl
-            text-base
-            leading-7
-            text-white/50
-          "
-        >
-          Explore scales, modes,
-          interval formulas and their
-          relationships. Change the
-          tonic to see the same musical
-          structure from any root.
-        </p>
+              <span className="scale-gradient-text">
+                Archive
+              </span>
+            </h1>
+
+            <p
+              className="
+                mt-2
+                max-w-3xl
+                text-sm
+                leading-6
+                text-white/50
+                sm:text-[15px]
+              "
+            >
+              Explore scale families,
+              modes, interval formulas
+              and their relationships.
+            </p>
+          </div>
+        </div>
       </header>
 
+      {/* Root piano */}
       <section
         className="
           mb-6
-          grid
-          gap-4
           rounded-[2rem]
           border
           border-white/10
           bg-black/25
-          p-5
+          px-3
+          py-4
+          shadow-[0_24px_80px_rgba(0,0,0,0.16)]
           backdrop-blur-sm
-          sm:p-6
-          md:grid-cols-[minmax(0,1fr)_11rem]
+          sm:px-5
+          sm:py-5
         "
       >
-        <label className="block">
-          <span
-            className="
-              text-xs
-              font-bold
-              uppercase
-              tracking-[0.18em]
-              text-white/35
-            "
-          >
-            Search
-          </span>
-
-          <input
-            type="search"
-            value={query}
-            onChange={(event) =>
-              setQuery(
-                event.target.value,
-              )
-            }
-            placeholder="Dorian, minor, ♭7..."
-            className="
-              mt-2
-              h-12
-              w-full
-              rounded-xl
-              border
-              border-white/10
-              bg-black/35
-              px-4
-              text-sm
-              text-white
-              outline-none
-              transition
-              placeholder:text-white/20
-              hover:border-white/20
-            "
-          />
-        </label>
-
-        <RootSelector
-          value={root}
-          onChange={setRoot}
+        <PianoKeyboard
+          activePitchClasses={
+            activePitchClasses
+          }
+          rootPitchClass={
+            rootPitchClass
+          }
+          onRootChange={
+            setRoot
+          }
         />
       </section>
+
 
       <div
         className="
@@ -225,17 +303,10 @@ export default function ScaleArchivePage() {
                 text-white/70
               "
             >
-              Diatonic modes
+              {
+                selectedFamily.listLabel
+              }
             </h2>
-
-            <span
-              className="
-                text-xs
-                text-white/30
-              "
-            >
-              {filteredScales.length} results
-            </span>
           </div>
 
           <div
@@ -249,8 +320,12 @@ export default function ScaleArchivePage() {
             {filteredScales.map(
               (scale) => (
                 <ScaleCard
-                  key={scale.id}
-                  scale={scale}
+                  key={
+                    scale.id
+                  }
+                  scale={
+                    scale
+                  }
                   selected={
                     selectedScale.id ===
                     scale.id
@@ -263,7 +338,8 @@ export default function ScaleArchivePage() {
             )}
           </div>
 
-          {filteredScales.length === 0 ? (
+          {filteredScales.length ===
+          0 ? (
             <div
               className="
                 rounded-2xl
@@ -275,15 +351,20 @@ export default function ScaleArchivePage() {
                 text-white/40
               "
             >
-              No scales match that search.
+              No scales match that
+              search.
             </div>
           ) : null}
         </section>
 
         <ScaleDetail
-          scale={selectedScale}
+          scale={
+            selectedScale
+          }
           root={root}
-          allScales={SCALES}
+          allScales={
+            familyScales
+          }
           onScaleSelect={
             setSelectedScaleId
           }

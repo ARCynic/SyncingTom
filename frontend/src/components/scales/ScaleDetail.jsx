@@ -36,10 +36,6 @@ import {
   PitchClock,
 } from "./PitchClock.jsx";
 
-import {
-  ScalePlaybackControls,
-} from "./ScalePlaybackControls.jsx";
-
 export function ScaleDetail({
   scale,
   root,
@@ -68,19 +64,19 @@ export function ScaleDetail({
     );
 
   const {
-  instrumentId,
-  transportState,
-  playbackPitchClass,
-  error: audioError,
+    instrumentId,
+    transportState,
+    playbackPitchClass,
+    error: audioError,
 
-  playPitchClass,
-  playScale,
-  stop,
+    playPitchClass,
+    playScale,
+    stop,
 
-  setInstrumentId,
-} = useScaleAudio({
-  notes,
-});
+    setInstrumentId,
+  } = useScaleAudio({
+    notes,
+  });
 
   useEffect(() => {
     setSelectedPitch(null);
@@ -145,102 +141,155 @@ export function ScaleDetail({
         lg:p-8
       "
     >
-      {/* Scale header */}
-      <div>
-        <p
-          className="
-            text-xs
-            font-bold
-            uppercase
-            tracking-[0.2em]
-          "
-          style={{
-            color:
-              "var(--scale-accent)",
-          }}
-        >
-          {scale.family}
-        </p>
-
-        <h2
-          className="
-            mt-3
-            text-3xl
-            font-semibold
-            tracking-[-0.04em]
-            text-white
-            sm:text-4xl
-          "
-        >
-          {displayNoteName(
-            root,
-          )}{" "}
-
-          <span className="scale-gradient-text">
-            {scale.name}
-          </span>
-        </h2>
-
-        {scale.modeName !==
-        scale.name ? (
-          <p
-            className="
-              mt-2
-              text-sm
-              text-white/35
-            "
-          >
-            Also known as{" "}
-            {scale.modeName}
-          </p>
-        ) : null}
-
-        <p
-          className="
-            mt-5
-            max-w-2xl
-            text-sm
-            leading-7
-            text-white/50
-          "
-        >
-          {scale.description}
-        </p>
-      </div>
-
-      {/* Pitch clock */}
-      <div className="mt-10">
-        <div
-          className="
-            mb-5
-            flex
-            flex-col
-            gap-1
-          "
-        >
+      {/* Scale header + instrument */}
+      <div
+        className="
+          grid
+          gap-6
+          md:grid-cols-[minmax(0,1fr)_15rem]
+          md:items-start
+        "
+      >
+        <div>
           <p
             className="
               text-xs
+              font-bold
+              uppercase
+              tracking-[0.2em]
+            "
+            style={{
+              color:
+                "var(--scale-accent)",
+            }}
+          >
+            {scale.family}
+          </p>
+
+          <h2
+            className="
+              mt-3
+              text-3xl
+              font-semibold
+              tracking-[-0.04em]
+              text-white
+              sm:text-4xl
+            "
+          >
+            {displayNoteName(
+              root,
+            )}{" "}
+
+            <span className="scale-gradient-text">
+              {scale.name}
+            </span>
+          </h2>
+
+          {scale.modeName !==
+          scale.name ? (
+            <p
+              className="
+                mt-2
+                text-sm
+                text-white/35
+              "
+            >
+              Also known as{" "}
+              {scale.modeName}
+            </p>
+          ) : null}
+
+          <p
+            className="
+              mt-5
+              max-w-2xl
+              text-sm
+              leading-7
+              text-white/50
+            "
+          >
+            {scale.description}
+          </p>
+        </div>
+
+        {/* Instrument selection */}
+        <label
+          className="
+            block
+            md:justify-self-end
+            md:w-full
+          "
+        >
+          <span
+            className="
+              text-[10px]
               font-bold
               uppercase
               tracking-[0.18em]
               text-white/30
             "
           >
-            Pitch clock
-          </p>
+            Instrument
+          </span>
 
-          <p
+          <select
+            value={
+              instrumentId
+            }
+            onChange={(
+              event,
+            ) =>
+              setInstrumentId(
+                event.target
+                  .value,
+              )
+            }
             className="
+              mt-2
+              h-11
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-black/35
+              px-4
               text-sm
-              text-white/35
+              font-semibold
+              text-white/75
+              outline-none
+              transition
+              hover:border-white/20
+              focus:border-cyan-300/35
             "
           >
-            Twelve chromatic pitch
-            classes arranged like a
-            clock face.
-          </p>
-        </div>
+            <option
+              value={
+                instrumentId
+              }
+            >
+              Soft Keys
+            </option>
+          </select>
+
+          {audioError ? (
+            <p
+              role="alert"
+              className="
+                mt-2
+                text-xs
+                leading-5
+                text-rose-300/80
+              "
+            >
+              {audioError}
+            </p>
+          ) : null}
+        </label>
+      </div>
+
+      {/* Pitch clock */}
+      <div className="mt-10">
+
 
         <div
           className="
@@ -255,18 +304,27 @@ export function ScaleDetail({
           "
         >
           <PitchClock
-              activePitchClasses={
-                activePitchClasses
-              }
-              rootPitchClass={
-                rootPitchClass
-              }
-              playbackPitchClass={
-                playbackPitchClass
-              }
-              onPitchSelect={
-                handlePitchSelect
-              }
+            activePitchClasses={
+              activePitchClasses
+            }
+            rootPitchClass={
+              rootPitchClass
+            }
+            playbackPitchClass={
+              playbackPitchClass
+            }
+            transportState={
+              transportState
+            }
+            onPitchSelect={
+              handlePitchSelect
+            }
+            onPlay={
+              playScale
+            }
+            onStop={
+              stop
+            }
           />
 
           {/* Selected pitch */}
@@ -348,38 +406,12 @@ export function ScaleDetail({
               </div>
             ) : (
               <p
-                className="
-                  text-xs
-                  text-white/25
-                "
+
               >
-                Select a pitch on
-                the clock.
+
               </p>
             )}
           </div>
-
-          {/* Scale playback */}
-          <ScalePlaybackControls
-            instrumentId={
-              instrumentId
-            }
-            transportState={
-              transportState
-            }
-            error={
-              audioError
-            }
-            onInstrumentChange={
-              setInstrumentId
-            }
-            onPlay={
-              playScale
-            }
-            onStop={
-              stop
-            }
-          />
         </div>
       </div>
 
@@ -518,7 +550,7 @@ export function ScaleDetail({
       ) : null}
 
       {/* Sibling modes */}
-      <div className="mt-8">
+      {/* <div className="mt-8">
         <p
           className="
             text-xs
@@ -573,8 +605,8 @@ export function ScaleDetail({
               </button>
             ),
           )}
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
     </section>
   );
 }

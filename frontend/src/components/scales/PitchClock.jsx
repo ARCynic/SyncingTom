@@ -17,18 +17,23 @@ function pointOnCircle(
   angleDegrees,
 ) {
   const angleRadians =
-    (angleDegrees * Math.PI) /
+    (angleDegrees *
+      Math.PI) /
     180;
 
   return {
     x:
       CENTER +
-      Math.cos(angleRadians) *
+      Math.cos(
+        angleRadians,
+      ) *
         radius,
 
     y:
       CENTER +
-      Math.sin(angleRadians) *
+      Math.sin(
+        angleRadians,
+      ) *
         radius,
   };
 }
@@ -142,6 +147,7 @@ function buildClockPositions(
     {
       length: 12,
     },
+
     (_, index) => {
       const pitchClass =
         (
@@ -160,19 +166,27 @@ export function PitchClock({
   activePitchClasses = [],
   rootPitchClass = null,
   playbackPitchClass = null,
+
+  transportState =
+    "stopped",
+
   onPitchSelect = null,
+  onPlay = null,
+  onStop = null,
+
   className = "",
 }) {
-  const activeSet = new Set(
-    activePitchClasses
-      .map(
-        normalizePitchClass,
-      )
-      .filter(
-        (value) =>
-          value !== null,
-      ),
-  );
+  const activeSet =
+    new Set(
+      activePitchClasses
+        .map(
+          normalizePitchClass,
+        )
+        .filter(
+          (value) =>
+            value !== null,
+        ),
+    );
 
   const normalizedRoot =
     normalizePitchClass(
@@ -184,15 +198,6 @@ export function PitchClock({
       playbackPitchClass,
     );
 
-  /*
-   * Rotate the visual clock so
-   * the selected root is always
-   * at 12 o'clock.
-   *
-   * Pitch-class values remain
-   * absolute. Only their visual
-   * positions change.
-   */
   const clockPositions =
     buildClockPositions(
       normalizedRoot,
@@ -201,6 +206,32 @@ export function PitchClock({
   const interactive =
     typeof onPitchSelect ===
     "function";
+
+  const isPlaying =
+    transportState ===
+    "playing";
+
+  const canPlay =
+    typeof onPlay ===
+    "function";
+
+  const canStop =
+    typeof onStop ===
+    "function";
+
+  function handleTransport() {
+    if (isPlaying) {
+      if (canStop) {
+        onStop();
+      }
+
+      return;
+    }
+
+    if (canPlay) {
+      void onPlay();
+    }
+  }
 
   function activatePitch(
     position,
@@ -234,7 +265,7 @@ export function PitchClock({
   return (
     <figure
       className={[
-        "mx-auto w-full max-w-[34rem]",
+        "relative mx-auto w-full max-w-[34rem]",
         className,
       ]
         .filter(Boolean)
@@ -335,7 +366,8 @@ export function PitchClock({
           ) => {
             const angle =
               -90 +
-              index * 30;
+              index *
+                30;
 
             const inner =
               pointOnCircle(
@@ -356,10 +388,18 @@ export function PitchClock({
             return (
               <line
                 key={`tick-${position.pitchClass}`}
-                x1={inner.x}
-                y1={inner.y}
-                x2={outer.x}
-                y2={outer.y}
+                x1={
+                  inner.x
+                }
+                y1={
+                  inner.y
+                }
+                x2={
+                  outer.x
+                }
+                y2={
+                  outer.y
+                }
                 stroke={
                   isQuarter
                     ? "rgba(103,232,249,0.28)"
@@ -385,7 +425,8 @@ export function PitchClock({
           ) => {
             const angle =
               -90 +
-              index * 30;
+              index *
+                30;
 
             const point =
               pointOnCircle(
@@ -404,7 +445,7 @@ export function PitchClock({
               normalizedRoot ===
                 position.pitchClass;
 
-            const isPlaying =
+            const markerIsPlaying =
               normalizedPlaybackPitch !==
                 null &&
               normalizedPlaybackPitch ===
@@ -414,7 +455,8 @@ export function PitchClock({
               getMarkerAppearance({
                 isActive,
                 isRoot,
-                isPlaying,
+                isPlaying:
+                  markerIsPlaying,
               });
 
             const ariaLabel =
@@ -422,7 +464,7 @@ export function PitchClock({
                 position,
                 isActive,
                 isRoot,
-                isPlaying,
+                markerIsPlaying,
               );
 
             function handleActivate() {
@@ -486,11 +528,14 @@ export function PitchClock({
                     : undefined
                 }
               >
-                {/* Larger invisible interaction target */}
                 {interactive ? (
                   <circle
-                    cx={point.x}
-                    cy={point.y}
+                    cx={
+                      point.x
+                    }
+                    cy={
+                      point.y
+                    }
                     r={
                       MARKER_RADIUS +
                       7
@@ -500,11 +545,14 @@ export function PitchClock({
                   />
                 ) : null}
 
-                {/* Playback halo */}
-                {isPlaying ? (
+                {markerIsPlaying ? (
                   <circle
-                    cx={point.x}
-                    cy={point.y}
+                    cx={
+                      point.x
+                    }
+                    cy={
+                      point.y
+                    }
                     r={
                       MARKER_RADIUS +
                       7
@@ -518,10 +566,13 @@ export function PitchClock({
                   />
                 ) : null}
 
-                {/* Visible pitch marker */}
                 <circle
-                  cx={point.x}
-                  cy={point.y}
+                  cx={
+                    point.x
+                  }
+                  cy={
+                    point.y
+                  }
                   r={
                     MARKER_RADIUS
                   }
@@ -536,7 +587,8 @@ export function PitchClock({
                   }
                   className={[
                     "pitch-clock-marker",
-                    isPlaying
+
+                    markerIsPlaying
                       ? "pitch-clock-marker-playing"
                       : "",
                   ]
@@ -548,7 +600,9 @@ export function PitchClock({
                 {position.secondary ? (
                   <>
                     <text
-                      x={point.x}
+                      x={
+                        point.x
+                      }
                       y={
                         point.y -
                         4
@@ -568,7 +622,9 @@ export function PitchClock({
                     </text>
 
                     <text
-                      x={point.x}
+                      x={
+                        point.x
+                      }
                       y={
                         point.y +
                         11
@@ -590,7 +646,9 @@ export function PitchClock({
                   </>
                 ) : (
                   <text
-                    x={point.x}
+                    x={
+                      point.x
+                    }
                     y={
                       point.y +
                       1
@@ -613,9 +671,58 @@ export function PitchClock({
             );
           },
         )}
-
-
       </svg>
+
+      {/* Center transport */}
+      <button
+        type="button"
+        onClick={
+          handleTransport
+        }
+        disabled={
+          isPlaying
+            ? !canStop
+            : !canPlay
+        }
+        aria-label={
+          isPlaying
+            ? "Stop scale playback"
+            : "Play scale"
+        }
+        className="
+          absolute
+          left-1/2
+          top-1/2
+          z-20
+          flex
+          h-20
+          w-20
+          -translate-x-1/2
+          -translate-y-1/2
+          items-center
+          justify-center
+          rounded-full
+          border
+          border-cyan-300/25
+          bg-black/75
+          text-xs
+          font-bold
+          uppercase
+          tracking-[0.12em]
+          text-cyan-100
+          shadow-[0_0_35px_rgba(103,232,249,0.10)]
+          backdrop-blur-sm
+          transition
+          hover:border-cyan-300/45
+          hover:bg-cyan-300/[0.08]
+          disabled:cursor-not-allowed
+          disabled:opacity-35
+        "
+      >
+        {isPlaying
+          ? "■"
+          : "▶"}
+      </button>
 
       <figcaption
         className="

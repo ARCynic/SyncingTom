@@ -32,9 +32,9 @@ export const HOME_TOOLS = [
   {
     id: "scale-archive",
 
-    group: "🎸",
+    group: "🎸🎹",
 
-    badge: "Pitch",
+    badge: "",
 
     title: "Scale Archive",
 
@@ -65,7 +65,7 @@ export const HOME_TOOLS = [
   {
     id: "subdivision-ladder",
 
-    group: "🥁",
+    group: "🥁🎹",
 
 
     title: "Subdivision Ladder",
@@ -134,7 +134,7 @@ export const HOME_TOOLS = [
     id: "fret-the-scales",
 
 
-    group: "🎸",
+    group: "🎸🎹",
 
     title: "Fret the Scales",
 
