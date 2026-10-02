@@ -2,206 +2,17 @@ import {
   Link,
 } from "react-router";
 
-const TOOLS = [
-  {
-    name:
-      "Meter Sequence",
+import {
+  HOME_TOOLS,
+} from "@/data/tools.js";
 
-    status:
-      "Available",
-
-    description:
-      "Build changing meter sequences, hear the transitions, loop difficult passages, and practise time signatures as a continuous musical structure.",
-  },
-
-  {
-    name:
-      "Subdivision Ladder",
-
-    status:
-      "Available",
-
-    description:
-      "Move through rhythmic subdivisions while keeping one central pulse, making the relationship between tempo, density, and timing easier to hear and feel.",
-  },
-
-  {
-    name:
-      "Scale Archive",
-
-    status:
-      "Available",
-
-    description:
-      "Explore scales from any root, inspect their interval structure, hear individual pitches, play complete scales, and view them on a root-relative pitch clock.",
-  },
-
-  {
-    name:
-      "Polymeter Player",
-
-    status:
-      "In development",
-
-    description:
-      "Layer independent drum patterns with different cycle lengths over one shared BPM and hear how they separate and eventually realign.",
-  },
-];
-
-const PRINCIPLES = [
-  {
-    title:
-      "Hear it",
-
-    description:
-      "Music theory and rhythm make more sense when the concept can immediately be heard.",
-  },
-
-  {
-    title:
-      "See it",
-
-    description:
-      "Visual structure helps expose relationships that are easy to miss when they remain only numbers or notation.",
-  },
-
-  {
-    title:
-      "Change it",
-
-    description:
-      "The tools are designed for experimentation. Change the root, meter, subdivision, pattern length, or tempo and listen to what happens.",
-  },
-
-  {
-    title:
-      "Practise it",
-
-    description:
-      "SyncingTom is built around repeatable musical exercises rather than passive reference pages.",
-  },
-];
-
-function Panel({
-  children,
-  className = "",
-}) {
-  return (
-    <section
-      className={[
-        `
-          relative
-          overflow-hidden
-          rounded-[2rem]
-          border
-          border-white/[0.08]
-          bg-black/30
-          shadow-[0_24px_80px_rgba(0,0,0,0.20)]
-          backdrop-blur-sm
-        `,
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-x-0
-          top-0
-          h-px
-          bg-gradient-to-r
-          from-transparent
-          via-cyan-300/40
-          to-transparent
-        "
-      />
-
-      {children}
-    </section>
-  );
-}
-
-function Eyebrow({
-  children,
-}) {
-  return (
-    <p
-      className="
-        text-[11px]
-        font-bold
-        uppercase
-        tracking-[0.22em]
-        text-cyan-300/75
-      "
-    >
-      {children}
-    </p>
-  );
-}
-
-function StatusPill({
-  children,
-  active = false,
-}) {
-  return (
-    <span
-      className="
-        inline-flex
-        items-center
-        rounded-full
-        border
-        px-2.5
-        py-1
-        text-[10px]
-        font-bold
-        uppercase
-        tracking-[0.14em]
-      "
-      style={{
-        borderColor:
-          active
-            ? "rgba(103,232,249,0.22)"
-            : "rgba(255,255,255,0.08)",
-
-        background:
-          active
-            ? "rgba(103,232,249,0.07)"
-            : "rgba(255,255,255,0.025)",
-
-        color:
-          active
-            ? "rgba(165,243,252,0.78)"
-            : "rgba(255,255,255,0.36)",
-      }}
-    >
-      {children}
-    </span>
-  );
-}
-
-function InterestTag({
-  children,
-}) {
-  return (
-    <span
-      className="
-        rounded-full
-        border
-        border-white/[0.08]
-        bg-white/[0.025]
-        px-4
-        py-2
-        text-sm
-        font-medium
-        text-white/55
-      "
-    >
-      {children}
-    </span>
-  );
-}
+const STAMP_TOOLS =
+  HOME_TOOLS
+    .filter(
+      (tool) =>
+        Boolean(tool.stamp),
+    )
+    .slice(0, 4);
 
 export default function AboutPage() {
   return (
@@ -211,283 +22,277 @@ export default function AboutPage() {
         overflow-hidden
       "
     >
-      {/* Background atmosphere */}
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          -z-10
-        "
-        style={{
-          background: `
-            radial-gradient(
-              900px circle at 15% 0%,
-              rgba(103,232,249,0.08),
-              transparent 55%
-            ),
-            radial-gradient(
-              700px circle at 90% 18%,
-              rgba(96,165,250,0.06),
-              transparent 60%
-            )
-          `,
-        }}
-      />
-
       <div
         className="
           mx-auto
           w-full
-          max-w-7xl
+          max-w-screen-xl
           px-4
-          py-12
+          py-10
           sm:px-6
-          sm:py-16
+          sm:py-14
           lg:px-8
-          lg:py-20
+          lg:py-16
         "
       >
         {/* Hero */}
         <header
           className="
-            max-w-4xl
+            grid
+            gap-10
+            lg:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)]
+            lg:items-center
+            lg:gap-16
           "
         >
-          <Eyebrow>
-            About SyncingTom
-          </Eyebrow>
-
-          <h1
-            className="
-              mt-5
-              max-w-4xl
-              text-4xl
-              font-semibold
-              tracking-[-0.05em]
-              text-white
-              sm:text-5xl
-              lg:text-6xl
-            "
-          >
-            A small music lab for{" "}
-
-            <span
-              className="
-                bg-gradient-to-r
-                from-cyan-200
-                to-blue-400
-                bg-clip-text
-                text-transparent
-              "
-            >
-              rhythm, timing,
-              theory and practice.
-            </span>
-          </h1>
-
-          <p
-            className="
-              mt-6
-              max-w-3xl
-              text-base
-              leading-8
-              text-white/50
-              sm:text-lg
-            "
-          >
-            SyncingTom is a
-            collection of
-            interactive tools for
-            musicians who like to
-            understand what they
-            are practising rather
-            than simply repeat it.
-          </p>
-
-          <p
-            className="
-              mt-4
-              max-w-3xl
-              text-base
-              leading-8
-              text-white/40
-            "
-          >
-            The project sits
-            somewhere between a
-            practice room, a music
-            theory reference, and
-            a small experimental
-            laboratory. Each tool
-            takes one musical idea,
-            makes its structure
-            visible, and lets you
-            hear and manipulate it
-            directly.
-          </p>
-
           <div
             className="
-              mt-8
-              flex
-              flex-wrap
-              gap-3
+              max-w-3xl
             "
           >
-            <Link
-              to="/"
+            <h1
               className="
-                inline-flex
-                min-h-11
-                items-center
-                justify-center
-                rounded-xl
-                border
-                border-cyan-300/25
-                bg-cyan-300/[0.08]
-                px-5
-                text-sm
+                text-4xl
                 font-semibold
-                text-cyan-100
-                transition
-                hover:bg-cyan-300/[0.13]
+                tracking-[-0.05em]
+                text-white
+                sm:text-5xl
+                lg:text-6xl
               "
             >
-              Explore the tools
-            </Link>
+              About{" "}
 
-            <Link
-              to="/scales"
-              className="
-                inline-flex
-                min-h-11
-                items-center
-                justify-center
-                rounded-xl
-                border
-                border-white/10
-                bg-white/[0.025]
-                px-5
-                text-sm
-                font-semibold
-                text-white/55
-                transition
-                hover:bg-white/[0.06]
-                hover:text-white
-              "
-            >
-              Open Scale Archive
-            </Link>
-          </div>
-        </header>
-
-        {/* What SyncingTom is */}
-        <Panel className="mt-12">
-          <div
-            className="
-              grid
-              gap-10
-              px-6
-              py-8
-              sm:px-8
-              sm:py-10
-              lg:grid-cols-[0.8fr_1.2fr]
-              lg:gap-16
-              lg:px-10
-            "
-          >
-            <div>
-              <Eyebrow>
-                The idea
-              </Eyebrow>
-
-              <h2
+              <span
                 className="
-                  mt-3
-                  text-2xl
-                  font-semibold
-                  tracking-[-0.035em]
-                  text-white
-                  sm:text-3xl
+                  bg-gradient-to-r
+                  from-amber-300
+                  via-purple-300
+                  to-emerald-300
+                  bg-clip-text
+                  text-transparent
                 "
               >
-                Music becomes
-                easier to reason
-                about when you can
-                hear the structure.
-              </h2>
-            </div>
+                SyncingTom
+              </span>
+            </h1>
+
+            <p
+              className="
+                mt-6
+                max-w-2xl
+                text-base
+                leading-8
+                text-white/55
+                sm:text-lg
+              "
+            >
+              SyncingTom is a
+              collection of small
+              music-practice tools
+              built around rhythm,
+              timing, pitch and
+              musical structure.
+            </p>
+
+            <p
+              className="
+                mt-4
+                max-w-2xl
+                text-base
+                leading-8
+                text-white/38
+              "
+            >
+              It started from a
+              simple need: make the
+              things I was
+              practising easier to
+              see, hear, repeat and
+              experiment with.
+              Rather than turning
+              every idea into a
+              theory lesson, the
+              tools try to make the
+              musical relationship
+              itself tangible.
+            </p>
 
             <div
               className="
-                space-y-5
+                mt-7
+                flex
+                flex-wrap
+                gap-x-6
+                gap-y-3
                 text-sm
-                leading-7
-                text-white/48
-                sm:text-[15px]
               "
             >
-              <p>
-                A meter can be
-                written as a pair
-                of numbers. A scale
-                can be written as
-                intervals. A
-                polymeter can be
-                explained using
-                least common
-                multiples. Those
-                descriptions are
-                useful, but they
-                are only one layer
-                of the musical
-                experience.
-              </p>
+              <Link
+                to="/"
+                className="
+                  font-medium
+                  text-cyan-200/75
+                  underline
+                  decoration-white/15
+                  underline-offset-4
+                  transition
+                  hover:text-cyan-100
+                "
+              >
+                Explore the tools
+              </Link>
 
-              <p>
-                SyncingTom tries to
-                connect the layers:
-                the mathematical
-                structure, the
-                visual pattern, the
-                sound, and the
-                physical act of
-                practising it.
-              </p>
-
-              <p>
-                The goal is not to
-                replace an
-                instrument,
-                teacher, score, or
-                metronome. It is to
-                provide small tools
-                that make difficult
-                musical
-                relationships
-                easier to inspect,
-                repeat, and
-                internalise.
-              </p>
+              <Link
+                to="/contact"
+                className="
+                  font-medium
+                  text-white/45
+                  underline
+                  decoration-white/15
+                  underline-offset-4
+                  transition
+                  hover:text-white/75
+                "
+              >
+                Get in touch
+              </Link>
             </div>
           </div>
-        </Panel>
 
-        {/* Current tools */}
-        <div className="mt-16">
+          {/* Stamp composition */}
+          <div
+            className="
+              hidden
+              grid-cols-2
+              items-center
+              gap-x-8
+              gap-y-5
+              lg:grid
+            "
+            aria-hidden="true"
+          >
+            {STAMP_TOOLS.map(
+              (
+                tool,
+                index,
+              ) => (
+                <div
+                  key={tool.id}
+                  className={[
+                    "flex min-h-36 items-center justify-center",
+                    index % 2 === 0
+                      ? "-rotate-2"
+                      : "rotate-2",
+                  ].join(" ")}
+                >
+                  <img
+                    src={
+                      tool.stamp
+                    }
+                    alt=""
+                    draggable="false"
+                    className="
+                      max-h-40
+                      w-full
+                      max-w-[13rem]
+                      object-contain
+                      opacity-75
+                    "
+                  />
+                </div>
+              ),
+            )}
+          </div>
+        </header>
+
+        {/* Why it exists */}
+        <section
+          className="
+            mt-14
+            grid
+            gap-8
+            border-t
+            border-white/[0.08]
+            pt-10
+            sm:mt-16
+            sm:pt-12
+            lg:grid-cols-[0.75fr_1.25fr]
+            lg:gap-16
+          "
+        >
+          <h2
+            className="
+              text-2xl
+              font-semibold
+              tracking-[-0.035em]
+              text-white
+              sm:text-3xl
+            "
+          >
+            Why it exists
+          </h2>
+
+          <div
+            className="
+              max-w-3xl
+              space-y-5
+              text-sm
+              leading-7
+              text-white/45
+              sm:text-[15px]
+            "
+          >
+            <p>
+              Musical ideas often
+              arrive as numbers,
+              formulas or notation.
+              A time signature can
+              be written down. A
+              scale can be reduced
+              to intervals. A
+              polymeter can be
+              described
+              mathematically.
+            </p>
+
+            <p>
+              Those descriptions
+              matter, but practising
+              the idea is different.
+              You need to hear where
+              the pulse moves, see
+              where cycles line up,
+              feel how subdivisions
+              change, or hear how a
+              set of intervals
+              actually behaves.
+            </p>
+
+            <p>
+              SyncingTom tries to
+              keep those things
+              close together:
+              structure, sound,
+              visual feedback and
+              repetition.
+            </p>
+          </div>
+        </section>
+
+        {/* Tools */}
+        <section
+          className="
+            mt-16
+            sm:mt-20
+          "
+        >
           <div
             className="
               max-w-3xl
             "
           >
-            <Eyebrow>
-              Current tools
-            </Eyebrow>
-
             <h2
               className="
-                mt-3
                 text-3xl
                 font-semibold
                 tracking-[-0.04em]
@@ -495,77 +300,107 @@ export default function AboutPage() {
                 sm:text-4xl
               "
             >
-              Different musical
-              problems, one shared
-              approach.
+              The tools
             </h2>
+
+            <p
+              className="
+                mt-4
+                max-w-2xl
+                text-sm
+                leading-7
+                text-white/38
+                sm:text-[15px]
+              "
+            >
+              Each one focuses on a
+              specific practice
+              problem. They share
+              the same idea: change
+              something, hear the
+              result, and work with
+              it directly.
+            </p>
           </div>
 
           <div
             className="
-              mt-7
-              grid
-              gap-4
-              md:grid-cols-2
+              mt-8
+              border-t
+              border-white/[0.08]
             "
           >
-            {TOOLS.map(
-              (tool) => {
-                const available =
-                  tool.status ===
-                  "Available";
-
-                return (
-                  <article
-                    key={
-                      tool.name
-                    }
+            {HOME_TOOLS.map(
+              (
+                tool,
+                index,
+              ) => (
+                <article
+                  key={tool.id}
+                  className="
+                    grid
+                    gap-5
+                    border-b
+                    border-white/[0.08]
+                    py-7
+                    sm:grid-cols-[7.5rem_minmax(0,1fr)]
+                    sm:items-center
+                    sm:gap-8
+                    sm:py-8
+                  "
+                >
+                  <div
                     className="
-                      rounded-[1.5rem]
-                      border
-                      border-white/[0.08]
-                      bg-white/[0.018]
-                      p-6
-                      transition
-                      hover:border-white/[0.13]
-                      hover:bg-white/[0.025]
+                      flex
+                      h-24
+                      items-center
+                      justify-start
+                      sm:h-28
+                      sm:justify-center
+                    "
+                    aria-hidden="true"
+                  >
+                    {tool.stamp ? (
+                      <img
+                        src={
+                          tool.stamp
+                        }
+                        alt=""
+                        draggable="false"
+                        className={[
+                          "max-h-24 max-w-28 object-contain opacity-75 sm:max-h-28",
+                          index % 2 ===
+                          0
+                            ? "-rotate-1"
+                            : "rotate-1",
+                        ].join(
+                          " ",
+                        )}
+                      />
+                    ) : null}
+                  </div>
+
+                  <div
+                    className="
+                      max-w-3xl
                     "
                   >
-                    <div
+                    <h3
                       className="
-                        flex
-                        items-start
-                        justify-between
-                        gap-4
+                        text-xl
+                        font-semibold
+                        tracking-[-0.025em]
+                        text-white
                       "
                     >
-                      <h3
-                        className="
-                          text-xl
-                          font-semibold
-                          tracking-[-0.025em]
-                          text-white
-                        "
-                      >
-                        {
-                          tool.name
-                        }
-                      </h3>
-
-                      <StatusPill
-                        active={
-                          available
-                        }
-                      >
-                        {
-                          tool.status
-                        }
-                      </StatusPill>
-                    </div>
+                      {
+                        tool.title
+                      }
+                    </h3>
 
                     <p
                       className="
-                        mt-4
+                        mt-3
                         text-sm
                         leading-7
                         text-white/42
@@ -575,271 +410,55 @@ export default function AboutPage() {
                         tool.description
                       }
                     </p>
-                  </article>
-                );
-              },
+
+                    {tool.route ? (
+                      <Link
+                        to={
+                          tool.route
+                        }
+                        className="
+                          mt-4
+                          inline-block
+                          text-sm
+                          font-medium
+                          text-white/40
+                          underline
+                          decoration-white/15
+                          underline-offset-4
+                          transition
+                          hover:text-cyan-200/80
+                        "
+                      >
+                        Open{" "}
+                        {
+                          tool.title
+                        }
+                      </Link>
+                    ) : null}
+                  </div>
+                </article>
+              ),
             )}
           </div>
-        </div>
+        </section>
 
-        {/* Philosophy */}
-        <Panel className="mt-16">
-          <div
-            className="
-              px-6
-              py-8
-              sm:px-8
-              sm:py-10
-              lg:px-10
-            "
-          >
-            <Eyebrow>
-              How the tools are
-              designed
-            </Eyebrow>
-
-            <h2
-              className="
-                mt-3
-                text-2xl
-                font-semibold
-                tracking-[-0.035em]
-                text-white
-                sm:text-3xl
-              "
-            >
-              Hear it. See it.
-              Change it. Practise
-              it.
-            </h2>
-
-            <div
-              className="
-                mt-8
-                grid
-                gap-6
-                sm:grid-cols-2
-                lg:grid-cols-4
-              "
-            >
-              {PRINCIPLES.map(
-                (
-                  principle,
-                ) => (
-                  <div
-                    key={
-                      principle.title
-                    }
-                  >
-                    <div
-                      className="
-                        h-px
-                        w-8
-                        bg-cyan-300/60
-                      "
-                    />
-
-                    <h3
-                      className="
-                        mt-4
-                        text-base
-                        font-semibold
-                        text-white/85
-                      "
-                    >
-                      {
-                        principle.title
-                      }
-                    </h3>
-
-                    <p
-                      className="
-                        mt-2
-                        text-sm
-                        leading-6
-                        text-white/38
-                      "
-                    >
-                      {
-                        principle.description
-                      }
-                    </p>
-                  </div>
-                ),
-              )}
-            </div>
-          </div>
-        </Panel>
-
-        {/* Areas */}
-        <div
+        {/* Approach */}
+        <section
           className="
             mt-16
             grid
-            gap-6
-            lg:grid-cols-[1fr_0.8fr]
+            gap-8
+            border-t
+            border-white/[0.08]
+            pt-10
+            sm:mt-20
+            sm:pt-12
+            lg:grid-cols-[0.75fr_1.25fr]
+            lg:gap-16
           "
         >
-          <Panel>
-            <div
-              className="
-                px-6
-                py-8
-                sm:px-8
-                sm:py-10
-              "
-            >
-              <Eyebrow>
-                Areas of interest
-              </Eyebrow>
-
-              <h2
-                className="
-                  mt-3
-                  text-2xl
-                  font-semibold
-                  tracking-[-0.035em]
-                  text-white
-                "
-              >
-                The territory
-                SyncingTom explores
-              </h2>
-
-              <div
-                className="
-                  mt-6
-                  flex
-                  flex-wrap
-                  gap-2.5
-                "
-              >
-                {[
-                  "Rhythm",
-                  "Meter",
-                  "Subdivision",
-                  "Polymeter",
-                  "Timing",
-                  "Groove",
-                  "Scales",
-                  "Intervals",
-                  "Music Theory",
-                  "Ear Training",
-                  "Instrument Practice",
-                  "Musical Patterns",
-                ].map(
-                  (label) => (
-                    <InterestTag
-                      key={
-                        label
-                      }
-                    >
-                      {label}
-                    </InterestTag>
-                  ),
-                )}
-              </div>
-            </div>
-          </Panel>
-
-          <Panel>
-            <div
-              className="
-                px-6
-                py-8
-                sm:px-8
-                sm:py-10
-              "
-            >
-              <Eyebrow>
-                Still evolving
-              </Eyebrow>
-
-              <h2
-                className="
-                  mt-3
-                  text-2xl
-                  font-semibold
-                  tracking-[-0.035em]
-                  text-white
-                "
-              >
-                This is a working
-                music lab.
-              </h2>
-
-              <div
-                className="
-                  mt-5
-                  space-y-4
-                  text-sm
-                  leading-7
-                  text-white/43
-                "
-              >
-                <p>
-                  SyncingTom is
-                  being built
-                  incrementally.
-                  Tools begin as
-                  functional
-                  experiments and
-                  are refined as
-                  their musical
-                  behaviour becomes
-                  clearer.
-                </p>
-
-                <p>
-                  That means some
-                  parts will remain
-                  deliberately
-                  simple while the
-                  underlying timing,
-                  audio, and theory
-                  systems are being
-                  developed.
-                </p>
-
-                <p
-                  className="
-                    text-white/65
-                  "
-                >
-                  Function first.
-                  Musical clarity
-                  second. Polish
-                  after the idea
-                  works.
-                </p>
-              </div>
-            </div>
-          </Panel>
-        </div>
-
-        {/* Closing */}
-        <div
-          className="
-            mx-auto
-            mt-20
-            max-w-3xl
-            text-center
-          "
-        >
-          <p
+          <h2
             className="
-              text-sm
-              font-semibold
-              tracking-wide
-              text-cyan-200/70
-            "
-          >
-            SyncingTom
-          </p>
-
-          <p
-            className="
-              mt-4
               text-2xl
               font-semibold
               tracking-[-0.035em]
@@ -847,52 +466,120 @@ export default function AboutPage() {
               sm:text-3xl
             "
           >
-            Learn the pattern.
-            Hear the relationship.
-            Make it musical.
-          </p>
+            How I think about it
+          </h2>
 
-          <p
+          <div
             className="
-              mx-auto
-              mt-4
-              max-w-xl
+              max-w-3xl
+              space-y-5
               text-sm
               leading-7
-              text-white/35
+              text-white/45
+              sm:text-[15px]
             "
           >
-            More tools, sounds,
-            visualisations, and
-            practice systems will
-            be added as SyncingTom
-            develops.
-          </p>
+            <p>
+              The site is meant to
+              stay practical. If a
+              tool makes a practice
+              problem clearer, it
+              belongs here. If it
+              only adds another
+              layer of explanation
+              without helping the
+              exercise itself, it
+              probably does not.
+            </p>
 
-          <Link
-            to="/"
+            <p>
+              That also means some
+              tools will remain
+              deliberately small.
+              They do not need to
+              become full music
+              applications. They
+              need to do one thing
+              well enough to be
+              useful during an
+              actual practice
+              session.
+            </p>
+          </div>
+        </section>
+
+        {/* Closing */}
+        <section
+          className="
+            mt-16
+            border-t
+            border-white/[0.08]
+            pt-10
+            sm:mt-20
+            sm:pt-12
+          "
+        >
+          <div
             className="
-              mt-7
-              inline-flex
-              min-h-11
-              items-center
-              justify-center
-              rounded-xl
-              border
-              border-white/10
-              bg-white/[0.025]
-              px-5
-              text-sm
-              font-semibold
-              text-white/55
-              transition
-              hover:bg-white/[0.06]
-              hover:text-white
+              grid
+              gap-8
+              lg:grid-cols-[1fr_auto]
+              lg:items-end
             "
           >
-            Back to SyncingTom
-          </Link>
-        </div>
+            <div
+              className="
+                max-w-2xl
+              "
+            >
+              <h2
+                className="
+                  text-2xl
+                  font-semibold
+                  tracking-[-0.035em]
+                  text-white
+                  sm:text-3xl
+                "
+              >
+                SyncingTom will
+                keep changing as
+                the practice does.
+              </h2>
+
+              <p
+                className="
+                  mt-4
+                  text-sm
+                  leading-7
+                  text-white/38
+                  sm:text-[15px]
+                "
+              >
+                New tools and
+                refinements will be
+                added when there is
+                a useful musical
+                reason for them.
+              </p>
+            </div>
+
+            <Link
+              to="/"
+              className="
+                text-sm
+                font-medium
+                text-cyan-200/70
+                underline
+                decoration-white/15
+                underline-offset-4
+                transition
+                hover:text-cyan-100
+              "
+            >
+              Back to SyncingTom
+            </Link>
+          </div>
+        </section>
       </div>
     </main>
   );
