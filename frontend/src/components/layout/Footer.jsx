@@ -274,7 +274,7 @@ export default function Footer() {
             © {year}{" "}
 
             <a
-              href=""
+              href="https://polymathictrail.space"
               className="
                 text-cyan-300
                 underline-offset-4
@@ -369,7 +369,7 @@ export default function Footer() {
             </Link>
 
             <SocialIcon
-              href=""
+              href="https://github.com/ARCynic"
               label="GitHub"
               icon={
                 <svg
@@ -392,30 +392,19 @@ export default function Footer() {
               }
             />
 
-            <SocialIcon
-              href=""
-              label="Twitter"
-              icon={
-                <svg
-                  viewBox="0 0 24 24"
-                  className="
-                    h-4
-                    w-4
-                    sm:h-5
-                    sm:w-5
-                  "
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M18.9 2H22l-6.77 7.73L23.5 22h-6.7l-5.24-6.44L5.9 22H2.8l7.3-8.34L1 2h6.86l4.74 5.9L18.9 2Zm-1.2 18h1.86L7.74 3.88H5.76L17.7 20Z"
-                  />
-                </svg>
-              }
-            />
+              {/* Facebook */}
+  <SocialIcon
+    href="https://facebook.com/ARCynic"
+    label="Facebook"
+    icon={
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+        <path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.2-1.5 1.5-1.5H16.7V4.6c-.3 0-1.4-.1-2.7-.1-2.7 0-4.5 1.6-4.5 4.6V10.9H6.7V14h2.8v8h4z" />
+      </svg>
+    }
+  />
 
             <SocialIcon
-              href=""
+              href="https://www.instagram.com/arcynic_/"
               label="Instagram"
               icon={
                 <svg
