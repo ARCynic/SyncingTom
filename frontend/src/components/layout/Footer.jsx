@@ -393,15 +393,15 @@ export default function Footer() {
             />
 
               {/* Facebook */}
-  <SocialIcon
-    href="https://facebook.com/ARCynic"
-    label="Facebook"
-    icon={
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
-        <path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.2-1.5 1.5-1.5H16.7V4.6c-.3 0-1.4-.1-2.7-.1-2.7 0-4.5 1.6-4.5 4.6V10.9H6.7V14h2.8v8h4z" />
-      </svg>
-    }
-  />
+            <SocialIcon
+              href="https://facebook.com/ARCynic"
+              label="Facebook"
+              icon={
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+                  <path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.2-1.5 1.5-1.5H16.7V4.6c-.3 0-1.4-.1-2.7-.1-2.7 0-4.5 1.6-4.5 4.6V10.9H6.7V14h2.8v8h4z" />
+                </svg>
+              }
+            />
 
             <SocialIcon
               href="https://www.instagram.com/arcynic_/"
