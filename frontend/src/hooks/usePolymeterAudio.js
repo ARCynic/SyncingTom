@@ -86,9 +86,27 @@ export function usePolymeterAudio({
          */
         if (
           context.state ===
-          "suspended"
+          "closed"
+        ) {
+          throw new Error(
+            "Audio context has been closed.",
+          );
+        }
+
+        if (
+          context.state !==
+          "running"
         ) {
           await context.resume();
+        }
+
+        if (
+          context.state !==
+          "running"
+        ) {
+          throw new Error(
+            `Audio could not be started. Context state: ${context.state}.`,
+          );
         }
 
         if (

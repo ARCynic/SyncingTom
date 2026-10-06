@@ -123,7 +123,16 @@ export function useScaleAudio({
 
       if (
         context.state ===
-        "suspended"
+        "closed"
+      ) {
+        throw new Error(
+          "Audio context has been closed.",
+        );
+      }
+
+      if (
+        context.state !==
+        "running"
       ) {
         await context.resume();
       }
@@ -133,7 +142,7 @@ export function useScaleAudio({
         "running"
       ) {
         throw new Error(
-          "Audio could not be started.",
+          `Audio could not be started. Context state: ${context.state}.`,
         );
       }
 

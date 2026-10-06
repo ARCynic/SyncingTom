@@ -314,7 +314,16 @@ export class AudioEngine {
 
       if (
         context.state ===
-        "suspended"
+        "closed"
+      ) {
+        throw new Error(
+          "Audio context has been closed.",
+        );
+      }
+
+      if (
+        context.state !==
+        "running"
       ) {
         await context.resume();
       }
@@ -324,7 +333,7 @@ export class AudioEngine {
         "running"
       ) {
         throw new Error(
-          "Audio could not be started in this browser.",
+          `Audio could not be started. Context state: ${context.state}.`,
         );
       }
 
