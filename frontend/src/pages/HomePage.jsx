@@ -67,133 +67,196 @@ export default function HomePage() {
           w-full
           max-w-screen-2xl
           px-4
-          pb-8
-          pt-8
+          pb-4
+          pt-3
           sm:px-6
           sm:pb-10
-          sm:pt-10
+          sm:pt-3
           lg:px-8
-          lg:pb-12
-          lg:pt-12
+          lg:pb-6
+          lg:pt-3
         "
       >
         <div
           className="
-            lg:grid
-            lg:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)]
-            lg:items-end
-            lg:gap-12
+            relative
+            overflow-hidden
+            rounded-[2rem]
+            border
+            border-white/[0.08]
+            bg-white/[0.018]
+            px-6
+            py-7
+            shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_24px_80px_rgba(0,0,0,0.14)]
+            backdrop-blur-md
+            sm:px-8
+            sm:py-9
+            lg:px-10
+            lg:py-10
           "
         >
-          {/* Hero copy */}
+          {/* subtle hero tint */}
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+            "
+            style={{
+              background: `
+                radial-gradient(
+                  700px circle at 10% 0%,
+                  rgba(192,132,252,0.075),
+                  transparent 58%
+                ),
+                radial-gradient(
+                  600px circle at 92% 100%,
+                  rgba(110,231,183,0.055),
+                  transparent 58%
+                )
+              `,
+            }}
+          />
+
           <div
             className="
-              max-w-4xl
+              relative
+              lg:grid
+              lg:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)]
+              lg:items-center
+              lg:gap-14
             "
           >
-            <p
+            {/* Hero copy */}
+            <div
               className="
-                text-xs
-                font-bold
-                uppercase
-                tracking-[0.24em]
-                text-purple-300/55
-              "
-            >
-              Tools for music practice
-            </p>
-
-            <h1
-              className="
-                mt-4
                 max-w-4xl
-                text-5xl
-                font-semibold
-                tracking-[-0.055em]
-                text-white
-                sm:text-6xl
-                lg:text-7xl
               "
             >
-              <span
+              <p
                 className="
-                  bg-gradient-to-r
-                  from-amber-300
-                  to-purple-300
-                  bg-clip-text
-                  text-transparent
+                  text-xs
+                  font-bold
+                  uppercase
+                  tracking-[0.24em]
+                  text-purple-300/55
                 "
               >
-                Syncing
-              </span>
+                Tools for music practice
+              </p>
 
-              <span
+              <h1
                 className="
-                  bg-gradient-to-r
-                  from-purple-300
-                  to-emerald-300
-                  bg-clip-text
-                  text-transparent
+                  mt-4
+                  max-w-4xl
+                  text-4xl
+                  font-semibold
+                  tracking-[-0.055em]
+                  text-white
+                  sm:text-5xl
+                  lg:text-5xl
                 "
               >
-                Tom
-              </span>
-            </h1>
+                <span
+                  className="
+                    bg-gradient-to-r
+                    from-amber-300
+                    to-purple-300
+                    bg-clip-text
+                    text-transparent
+                  "
+                >
+                  Syncing
+                </span>
 
-            <p
+                <span
+                  className="
+                    bg-gradient-to-r
+                    from-purple-300
+                    to-emerald-300
+                    bg-clip-text
+                    text-transparent
+                  "
+                >
+                  Tom
+                </span>
+              </h1>
+
+              <p
+                className="
+                  mt-5
+                  max-w-2xl
+                  text-base
+                  leading-7
+                  text-white/58
+                  sm:text-lg
+                "
+              >
+                A small music-practice lab
+                for rhythm, timing, pitch
+                and musical structure.
+              </p>
+
+              <p
+                className="
+                  mt-3
+                  max-w-2xl
+                  text-sm
+                  leading-7
+                  text-white/38
+                  sm:text-[15px]
+                "
+              >
+                Hear patterns, change them,
+                repeat them, and turn music
+                theory into something you can
+                work with directly during
+                practice.
+              </p>
+            </div>
+
+            {/* Desktop knowledge */}
+            <div
               className="
-                mt-5
-                max-w-2xl
-                text-base
-                leading-7
-                text-white/45
-                sm:text-lg
+                hidden
+                max-w-md
+                border-l
+                border-white/[0.07]
+                pl-8
+                text-right
+                lg:block
+                lg:justify-self-end
               "
             >
-              Focused tools for rhythm,
-              timing, pitch and deliberate
-              musical practice.
-            </p>
-          </div>
+              <p
+                className="
+                  text-[10px]
+                  font-bold
+                  uppercase
+                  tracking-[0.2em]
+                  text-cyan-300/45
+                "
+              >
+                Did you know?
+              </p>
 
-          {/* Desktop knowledge */}
-          <div
-            className="
-              hidden
-              max-w-md
-              pb-1
-              text-right
-              lg:block
-              lg:justify-self-end
-            "
-          >
-            <p
-              className="
-                text-[10px]
-                font-bold
-                uppercase
-                tracking-[0.2em]
-                text-cyan-300/45
-              "
-            >
-              Did you know?
-            </p>
-
-            <p
-              key={
-                knowledge.id
-              }
-              className="
-                mt-3
-                text-sm
-                leading-6
-                text-white/38
-              "
-            >
-              {
-                knowledge.text
-              }
-            </p>
+              <p
+                key={
+                  knowledge.id
+                }
+                className="
+                  mt-3
+                  text-sm
+                  leading-6
+                  text-white/38
+                "
+              >
+                {
+                  knowledge.text
+                }
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -209,63 +272,110 @@ export default function HomePage() {
           w-full
           max-w-screen-2xl
           px-4
-          pb-32
+          pb-4
           sm:px-6
           lg:px-8
         "
       >
         <div
+  className="
+    relative
+    mb-5
+    px-5
+    py-4
+    sm:px-6
+    sm:py-5
+  "
+>
+  <div
+    className="
+      flex
+      items-center
+      justify-between
+      gap-6
+    "
+  >
+    <div>
+      <h2
+        className="
+          text-xl
+          font-semibold
+          tracking-[-0.025em]
+          text-white
+          sm:text-2xl
+        "
+      >
+        Pick a practice tool.
+      </h2>
+
+      <p
+        className="
+          mt-1
+          text-sm
+          leading-6
+          text-white/35
+        "
+      >
+        Scroll through the tools
+        and start with whatever
+        you want to work on.
+      </p>
+    </div>
+
+    <div
+      className="
+        hidden
+        shrink-0
+        items-center
+        gap-3
+        sm:flex
+      "
+    >
+      {/* <span
+        className="
+          text-xs
+          uppercase
+          tracking-[0.16em]
+          text-white/25
+        "
+      >
+        {HOME_TOOLS.length} tools
+      </span> */}
+
+      <span
+        aria-hidden="true"
+        className="
+          flex
+          h-9
+          w-9
+          items-center
+          justify-center
+          rounded-xl
+          border
+          border-white/[0.08]
+          bg-white/[0.025]
+          text-white/35
+        "
+      >
+        <svg
+          viewBox="0 0 20 20"
           className="
-            mb-8
-            flex
-            items-end
-            justify-between
-            gap-6
-            border-b
-            border-white/[0.07]
-            pb-5
+            h-4
+            w-4
           "
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <div>
-            <p
-              className="
-                text-[10px]
-                font-bold
-                uppercase
-                tracking-[0.2em]
-                text-emerald-300/45
-              "
-            >
-              Practice tools
-            </p>
-
-            <h2
-              className="
-                mt-2
-                text-2xl
-                font-semibold
-                tracking-[-0.025em]
-                text-white
-                sm:text-3xl
-              "
-            >
-              Pick a tool
-            </h2>
-          </div>
-
-          <span
-            className="
-              hidden
-              text-xs
-              uppercase
-              tracking-[0.14em]
-              text-white/20
-              sm:block
-            "
-          >
-            {HOME_TOOLS.length} tools
-          </span>
-        </div>
+          <path d="M10 4v11" />
+          <path d="m6 11 4 4 4-4" />
+        </svg>
+      </span>
+    </div>
+  </div>
+</div>
 
         <div
           className="
@@ -274,28 +384,43 @@ export default function HomePage() {
           "
         >
           {HOME_TOOLS.map(
-            (tool, index) => {
+            (
+              tool,
+              index,
+            ) => {
               const stampSide =
                 tool.stampSide ??
                 (
-                  index % 2 === 0
+                  index %
+                    2 ===
+                  0
                     ? "right"
                     : "left"
                 );
 
               return (
                 <ToolCard
-                  key={tool.id}
-                  to={tool.route}
-                  title={tool.title}
+                  key={
+                    tool.id
+                  }
+                  to={
+                    tool.route
+                  }
+                  title={
+                    tool.title
+                  }
                   description={
                     tool.description
                   }
                   practice={
                     tool.practice
                   }
-                  group={tool.group}
-                  badge={tool.badge}
+                  group={
+                    tool.group
+                  }
+                  badge={
+                    tool.badge
+                  }
                   stampSrc={
                     tool.stamp
                   }
@@ -312,8 +437,10 @@ export default function HomePage() {
                   stampSide={
                     stampSide
                   }
-                  ctaLabel="Open"
-                  minHeight={280}
+                  ctaLabel="Start Practicing"
+                  minHeight={
+                    280
+                  }
                   split={[
                     1.7,
                     1,

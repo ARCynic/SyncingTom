@@ -1,14 +1,41 @@
+const GUITAR = {
+  src:
+    "/assets/emoji/eguitaremoji.png",
 
+  alt:
+    "Guitar",
+};
+
+const DRUMS = {
+  src:
+    "/assets/emoji/drumemoji.png",
+
+  alt:
+    "Drums",
+};
+
+const KEYS = {
+  src:
+    "/assets/emoji/keyboardemoji.png",
+
+  alt:
+    "Keyboard",
+};
 
 export const HOME_TOOLS = [
   {
-    id: "scale-archive",
+    id:
+      "scale-archive",
 
-    group: "🎸🎹",
+    group: [
+      GUITAR,
+      KEYS,
+    ],
 
     badge: "",
 
-    title: "Scale Archive",
+    title:
+      "Scale Archive",
 
     description:
       "Explore scale roots and modes, hear their notes, and inspect their interval shape before taking them onto the instrument.",
@@ -22,7 +49,8 @@ export const HOME_TOOLS = [
     stamp:
       "/assets/scale_archive.png",
 
-    monogram: "SA",
+    monogram:
+      "SA",
 
     accent:
       "#93c5fd",
@@ -33,12 +61,19 @@ export const HOME_TOOLS = [
     stampSide:
       "left",
   },
-    {
-    id: "polymeter",
 
-    group: "🎸 🥁",
+  {
+    id:
+      "polymeter",
 
-    title: "Polymeter",
+    group: [
+      GUITAR,
+      DRUMS,
+      KEYS,
+    ],
+
+    title:
+      "Polymeter",
 
     description:
       "Layer drum patterns with different cycle lengths over one shared pulse and hear how they separate and realign.",
@@ -46,63 +81,77 @@ export const HOME_TOOLS = [
     practice:
       "Explore independent rhythmic cycles without losing the common temporal grid underneath them.",
 
-
-    route: "/polymeter",
+    route:
+      "/polymeter",
 
     stamp:
       "/assets/polymeter.png",
 
-    monogram: "PM",
+    monogram:
+      "PM",
 
-    accent: "#22d3ee",
+    accent:
+      "#22d3ee",
 
     glow:
       "rgba(34, 211, 238, 0.11)",
-      stampSide:
+
+    stampSide:
       "right",
   },
-  
-  
   {
-    id: "subdivision-ladder",
+    id:
+      "fret-the-scales",
 
-    group: "🥁🎹",
+    group: [
+      GUITAR,
+      KEYS,
+    ],
 
-
-    title: "Subdivision Ladder",
+    title:
+      "Fret the Scales",
 
     description:
-      "Keep the meter and pulse fixed while changing how many notes fit inside each beat.",
+      "Connect scale knowledge to physical fretboard positions through short exercises for bass and guitar.",
 
     practice:
-      "Design custom ladders such as 1 → 2 → 3 → 4 → 5 → 7 → 8 and train transitions between rhythmic densities without changing tempo.",
+      "Designed around note recall, scale degrees, positions, and eventually moving confidently across the neck.",
 
     route:
-      "/subdivision-ladder",
+      "/fret-the-scales",
 
     stamp:
-      "/assets/subdiv_lad.png",
+      "/assets/fret_the_scale.png",
 
-    monogram: "SL",
+    monogram:
+      "FS",
 
     accent:
-      "#6ee7b7",
+      "#c4b5fd",
 
     glow:
-      "rgba(110, 231, 183, 0.11)",
+      "rgba(196, 181, 253, 0.11)",
 
     stampSide:
       "left",
   },
 
-  {
-    id: "meter-sequence",
+  
 
-    group: "🎸🥁",
+  {
+    id:
+      "meter-sequence",
+
+    group: [
+      GUITAR,
+      DRUMS,
+      KEYS,
+    ],
 
     badge: "",
 
-    title: "Meter Sequence",
+    title:
+      "Meter Sequence",
 
     description:
       "Build changing meter sequences and practice moving between time signatures without losing the underlying tempo.",
@@ -116,7 +165,8 @@ export const HOME_TOOLS = [
     stamp:
       "/assets/meter_seq.png",
 
-    monogram: "MS",
+    monogram:
+      "MS",
 
     accent:
       "#c084fc",
@@ -127,40 +177,42 @@ export const HOME_TOOLS = [
     stampSide:
       "right",
   },
-
-
-  
-
   {
-    id: "fret-the-scales",
+    id:
+      "subdivision-ladder",
 
+    group: [
+      DRUMS,
+      KEYS,
+    ],
 
-    group: "🎸🎹",
-
-    title: "Fret the Scales",
+    title:
+      "Subdivision Ladder",
 
     description:
-      "Connect scale knowledge to physical fretboard positions through short exercises for bass and guitar.",
+      "Keep the meter and pulse fixed while changing how many notes fit inside each beat.",
 
     practice:
-      "Designed around note recall, scale degrees, positions, and eventually moving confidently across the neck.",
-
+      "Design custom ladders such as 1 → 2 → 3 → 4 → 5 → 7 → 8 and train transitions between rhythmic densities without changing tempo.",
 
     route:
-      "/fret-the-scales",
-
+      "/subdivision-ladder",
 
     stamp:
-      "/assets/fret_the_scale.png",
+      "/assets/subdiv_lad.png",
 
-    monogram: "FS",
+    monogram:
+      "SL",
 
-    accent: "#c4b5fd",
+    accent:
+      "#6ee7b7",
 
     glow:
-      "rgba(196, 181, 253, 0.11)",
-      
+      "rgba(110, 231, 183, 0.11)",
+
     stampSide:
       "left",
   },
+
+  
 ];

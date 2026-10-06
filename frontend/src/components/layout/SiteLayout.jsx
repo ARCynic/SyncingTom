@@ -64,13 +64,13 @@ export default function SiteLayout() {
           fixed
           inset-0
           z-[2]
-          opacity-75
+          opacity-85
         "
       />
 
       {/* Vignette */}
 
-      <div
+      {/* <div
         aria-hidden="true"
         className="
           pointer-events-none
@@ -79,11 +79,11 @@ export default function SiteLayout() {
           z-[3]
           bg-[radial-gradient(circle_900px_at_50%_8%,transparent_10%,rgba(9,9,11,0.18)_48%,#09090b_115%)]
         "
-      />
+      /> */}
 
       {/* Lower darkness */}
 
-      <div
+      {/* <div
         aria-hidden="true"
         className="
           pointer-events-none
@@ -95,7 +95,7 @@ export default function SiteLayout() {
           via-transparent
           to-black/20
         "
-      />
+      /> */}
 
       {/* --------------------------------
           SITE CONTENT

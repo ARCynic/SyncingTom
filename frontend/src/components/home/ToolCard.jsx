@@ -6,6 +6,8 @@ import {
   Link,
 } from "react-router";
 
+
+
 const cx = (...classes) =>
   classes
     .filter(Boolean)
@@ -86,7 +88,7 @@ export default function ToolCard({
   split = [1.7, 1],
   stampSide = "right",
 
-  ctaLabel = "Open tool",
+  ctaLabel = "Open",
 
   className = "",
 }) {
@@ -94,6 +96,8 @@ export default function ToolCard({
     imageFailed,
     setImageFailed,
   ] = useState(false);
+
+
 
   const [
     textRatio,
@@ -132,20 +136,50 @@ export default function ToolCard({
           flex
           flex-wrap
           items-center
-          gap-3
+          gap-2
         "
       >
-        {group ? (
-          <span
-            aria-hidden="true"
+        {Array.isArray(group) &&
+        group.length > 0 ? (
+          <div
             className="
-              text-3xl
-              leading-none
-              sm:text-4xl
+              flex
+              items-center
+              gap-2
             "
+            aria-label="Supported instruments"
           >
-            {group}
-          </span>
+            {group.map(
+              (instrument) => (
+                <img
+                  key={
+                    instrument.src
+                  }
+                  src={
+                    instrument.src
+                  }
+                  alt={
+                    instrument.alt
+                  }
+                  title={
+                    instrument.alt
+                  }
+                  draggable="false"
+                  className="
+                    h-8
+                    w-8
+                    object-contain
+                    opacity-80
+                    transition
+                    duration-200
+                    hover:opacity-100
+                    sm:h-9
+                    sm:w-9
+                  "
+                />
+              ),
+            )}
+          </div>
         ) : null}
 
         {badge ? (
@@ -236,47 +270,133 @@ export default function ToolCard({
         </div>
       ) : null}
 
-      <div className="mt-7">
-        <Link
-          to={to}
-          className="
-            inline-flex
-            min-h-11
-            items-center
-            rounded-xl
-            border
-            border-white/10
-            bg-white/[0.045]
-            px-4
-            py-2
-            text-sm
-            font-semibold
-            text-white/75
-            ring-4
-            ring-white/[0.035]
-            transition-all
-            duration-200
-            hover:border-white/15
-            hover:bg-white/[0.08]
-            hover:text-white
-            hover:ring-white/[0.07]
-          "
-        >
-          {ctaLabel}
+      <div
+  className="
+    mt-7
+    flex
+    items-center
+  "
+>
+  <Link
+    to={to}
+    className="
+      group/cta
+      relative
+      inline-flex
+      min-h-12
+      items-center
+      overflow-hidden
+      rounded-xl
+      border
+      px-5
+      py-2.5
+      text-sm
+      font-semibold
+      tracking-[0.01em]
+      text-white/90
+      shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_10px_30px_rgba(0,0,0,0.20)]
+      backdrop-blur-xl
+      transition-colors
+      duration-200
+      hover:text-white
+      focus-visible:outline-none
+      focus-visible:ring-2
+      focus-visible:ring-white/30
+      focus-visible:ring-offset-2
+      focus-visible:ring-offset-black
+    "
+    style={{
+      borderColor:
+        hexToRgba(
+          accent,
+          0.34,
+        ),
 
-          <span
-            aria-hidden="true"
-            className="
-              ml-2
-              text-white/40
-              transition-transform
-              duration-200
-              group-hover:translate-x-0.5
-            "
-          >
-          </span>
-        </Link>
-      </div>
+      background:
+        `linear-gradient(
+          135deg,
+          ${hexToRgba(
+            accent,
+            0.18,
+          )},
+          ${hexToRgba(
+            accent,
+            0.07,
+          )} 55%,
+          rgba(255,255,255,0.025)
+        )`,
+    }}
+  >
+    <span
+      aria-hidden="true"
+      className="
+        pointer-events-none
+        absolute
+        inset-x-0
+        top-0
+        h-px
+      "
+      style={{
+        background:
+          `linear-gradient(
+            90deg,
+            transparent,
+            ${hexToRgba(
+              accent,
+              0.7,
+            )},
+            transparent
+          )`,
+      }}
+    />
+
+    <span
+      aria-hidden="true"
+      className="
+        mr-3
+        flex
+        h-7
+        w-7
+        shrink-0
+        items-center
+        justify-center
+        rounded-lg
+        border
+        bg-black/15
+      "
+      style={{
+        borderColor:
+          hexToRgba(
+            accent,
+            0.28,
+          ),
+      }}
+    >
+      <svg
+        viewBox="0 0 20 20"
+        className="
+          h-3.5
+          w-3.5
+        "
+        fill="currentColor"
+        style={{
+          color:
+            hexToRgba(
+              accent,
+              0.95,
+            ),
+        }}
+        aria-hidden="true"
+      >
+        <path d="M6.5 4.8a1 1 0 0 1 1.52-.85l7.1 4.7a1.6 1.6 0 0 1 0 2.7l-7.1 4.7A1 1 0 0 1 6.5 15.2V4.8Z" />
+      </svg>
+    </span>
+
+    <span>
+      {ctaLabel}
+    </span>
+  </Link>
+</div>
     </div>
   );
 
@@ -295,8 +415,6 @@ export default function ToolCard({
         md:p-6
       "
     >
-      {/* fade between text and image */}
-
       <div
         aria-hidden="true"
         className={cx(
@@ -308,20 +426,18 @@ export default function ToolCard({
             "right"
             ? [
                 "bg-gradient-to-r",
-                "from-black/45",
-                "via-black/10",
+                "from-black/25",
+                "via-black/5",
                 "to-transparent",
               ].join(" ")
             : [
                 "bg-gradient-to-l",
-                "from-black/45",
-                "via-black/10",
+                "from-black/25",
+                "via-black/5",
                 "to-transparent",
               ].join(" "),
         )}
       />
-
-      {/* local glow */}
 
       <div
         aria-hidden="true"
@@ -330,11 +446,11 @@ export default function ToolCard({
           absolute
           inset-[14%]
           rounded-full
-          opacity-70
+          opacity-55
           blur-3xl
           transition
           duration-500
-          group-hover:opacity-100
+          group-hover:opacity-80
         "
         style={{
           background:
@@ -386,7 +502,7 @@ export default function ToolCard({
             rounded-full
             border
             border-white/10
-            bg-black/25
+            bg-black/20
             text-4xl
             font-semibold
             tracking-[-0.06em]
@@ -418,17 +534,17 @@ export default function ToolCard({
         "border",
         "border-white/[0.08]",
 
-        "bg-black/70",
-        "backdrop-blur-md",
+        "bg-white/[0.025]",
+        "backdrop-blur-sm",
 
-        "shadow-[0_24px_80px_rgba(0,0,0,0.22)]",
+        "shadow-[0_24px_80px_rgba(0,0,0,0.16)]",
 
         "transition-all",
         "duration-300",
 
         "hover:-translate-y-0.5",
         "hover:border-white/[0.13]",
-        "hover:bg-black/75",
+        "hover:bg-black/40",
 
         className,
       )}
@@ -436,8 +552,6 @@ export default function ToolCard({
         minHeight,
       }}
     >
-      {/* accent glow */}
-
       <div
         aria-hidden="true"
         className="
@@ -455,14 +569,12 @@ export default function ToolCard({
               760px circle at 12% 0%,
               ${hexToRgba(
                 accent,
-                0.16,
+                0.14,
               )},
               transparent 55%
             )`,
         }}
       />
-
-      {/* subtle top line */}
 
       <div
         aria-hidden="true"
@@ -472,7 +584,7 @@ export default function ToolCard({
           inset-x-10
           top-0
           h-px
-          opacity-50
+          opacity-40
         "
         style={{
           background:
@@ -481,14 +593,12 @@ export default function ToolCard({
               transparent,
               ${hexToRgba(
                 accent,
-                0.65,
+                0.55,
               )},
               transparent
             )`,
         }}
       />
-
-      {/* desktop */}
 
       <div
         className="
@@ -511,8 +621,6 @@ export default function ToolCard({
           ? TextColumn
           : StampColumn}
       </div>
-
-      {/* mobile */}
 
       <div
         className="
