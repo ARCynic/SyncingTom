@@ -24,10 +24,6 @@ import {
 } from "@/lib/scales/pitchClasses.js";
 
 import {
-  describeModeRelationship,
-} from "@/lib/scales/relationships.js";
-
-import {
   displayNoteName,
 } from "@/lib/scales/notes.js";
 
@@ -39,20 +35,21 @@ export function ScaleDetail({
   scale,
   root,
   allScales,
+  onScaleSelect,
 }) {
   const [
-  selectedPitchState,
-  setSelectedPitchState,
-] = useState(null);
+    selectedPitchState,
+    setSelectedPitchState,
+  ] = useState(null);
 
-const selectionKey =
-  `${root}:${scale.id}`;
+  const selectionKey =
+    `${root}:${scale.id}`;
 
-const selectedPitch =
-  selectedPitchState?.key ===
-  selectionKey
-    ? selectedPitchState.pitch
-    : null;
+  const selectedPitch =
+    selectedPitchState?.key ===
+    selectionKey
+      ? selectedPitchState.pitch
+      : null;
 
   const notes =
     buildScaleNotes(
@@ -75,23 +72,21 @@ const selectedPitch =
     transportState,
     playbackPitchClass,
     error: audioError,
-
     playPitchClass,
     playScale,
     stop,
-
     setInstrumentId,
   } = useScaleAudio({
     notes,
   });
 
   useEffect(() => {
-  stop();
-}, [
-  root,
-  scale.id,
-  stop,
-]);
+    stop();
+  }, [
+    root,
+    scale.id,
+    stop,
+  ]);
 
   const selectedMidi =
     selectedPitch
@@ -108,29 +103,18 @@ const selectedPitch =
         )
       : null;
 
-  const relationship =
-    describeModeRelationship(
-      scale,
-      allScales,
-    );
-
-  // const siblings =
-  //   getSiblingModes(
-  //     scale,
-  //     allScales,
-  //   );
-function handlePitchSelect(
-  pitch,
-) {
-  setSelectedPitchState({
-    key: selectionKey,
+  function handlePitchSelect(
     pitch,
-  });
+  ) {
+    setSelectedPitchState({
+      key: selectionKey,
+      pitch,
+    });
 
-  void playPitchClass(
-    pitch.pitchClass,
-  );
-}
+    void playPitchClass(
+      pitch.pitchClass,
+    );
+  }
 
   return (
     <section
@@ -140,172 +124,25 @@ function handlePitchSelect(
         border-white/10
         bg-black/25
         p-5
-        shadow-[0_24px_80px_rgba(0,0,0,0.22)]
+        shadow-[0_24px_80px_rgba(0,0,0,0.20)]
         backdrop-blur-sm
         sm:p-6
         lg:p-8
       "
     >
-      {/* Scale header + instrument */}
       <div
         className="
           grid
-          gap-6
-          md:grid-cols-[minmax(0,1fr)_15rem]
+          gap-8
+          md:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]
           md:items-start
         "
       >
-        <div>
-          <p
-            className="
-              text-xs
-              font-bold
-              uppercase
-              tracking-[0.2em]
-            "
-            style={{
-              color:
-                "var(--scale-accent)",
-            }}
-          >
-            {scale.family}
-          </p>
-
-          <h2
-            className="
-              mt-3
-              text-3xl
-              font-semibold
-              tracking-[-0.04em]
-              text-white
-              sm:text-4xl
-            "
-          >
-            {displayNoteName(
-              root,
-            )}{" "}
-
-            <span className="scale-gradient-text">
-              {scale.name}
-            </span>
-          </h2>
-
-          {scale.modeName !==
-          scale.name ? (
-            <p
-              className="
-                mt-2
-                text-sm
-                text-white/35
-              "
-            >
-              Also known as{" "}
-              {scale.modeName}
-            </p>
-          ) : null}
-
-          <p
-            className="
-              mt-5
-              max-w-2xl
-              text-sm
-              leading-7
-              text-white/50
-            "
-          >
-            {scale.description}
-          </p>
-        </div>
-
-        {/* Instrument selection */}
-        <label
-          className="
-            block
-            md:justify-self-end
-            md:w-full
-          "
-        >
-          <span
-            className="
-              text-[10px]
-              font-bold
-              uppercase
-              tracking-[0.18em]
-              text-white/30
-            "
-          >
-            Instrument
-          </span>
-
-          <select
-            value={
-              instrumentId
-            }
-            onChange={(
-              event,
-            ) =>
-              setInstrumentId(
-                event.target
-                  .value,
-              )
-            }
-            className="
-              mt-2
-              h-11
-              w-full
-              rounded-xl
-              border
-              border-white/10
-              bg-black/35
-              px-4
-              text-sm
-              font-semibold
-              text-white/75
-              outline-none
-              transition
-              hover:border-white/20
-              focus:border-cyan-300/35
-            "
-          >
-            <option
-              value={
-                instrumentId
-              }
-            >
-              Soft Keys
-            </option>
-          </select>
-
-          {audioError ? (
-            <p
-              role="alert"
-              className="
-                mt-2
-                text-xs
-                leading-5
-                text-rose-300/80
-              "
-            >
-              {audioError}
-            </p>
-          ) : null}
-        </label>
-      </div>
-
-      {/* Pitch clock */}
-      <div className="mt-10">
-
-
+        {/* CLOCK */}
         <div
           className="
-            rounded-[2rem]
-            border
-            border-white/[0.07]
-            bg-white/[0.012]
-            px-3
-            py-6
-            sm:px-6
-            sm:py-8
+            min-w-0
+            md:pr-2
           "
         >
           <PitchClock
@@ -332,327 +169,310 @@ function handlePitchSelect(
             }
           />
 
-          {/* Selected pitch */}
+          {selectedPitch ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="
+                mt-3
+                text-center
+              "
+            >
+              <p
+                className="
+                  text-sm
+                  text-white/55
+                "
+              >
+                <strong
+                  className="
+                    font-semibold
+                    text-cyan-200
+                  "
+                >
+                  {selectedPitch.primary}
+
+                  {selectedPitch.secondary
+                    ? ` / ${selectedPitch.secondary}`
+                    : ""}
+                </strong>
+
+                {" · "}
+
+                {selectedPitch.isRoot
+                  ? "Root"
+                  : selectedPitch.isScaleTone
+                    ? "Scale tone"
+                    : "Outside scale"}
+              </p>
+
+              <p
+                className="
+                  mt-1
+                  font-mono
+                  text-[11px]
+                  text-white/25
+                "
+              >
+                MIDI {selectedMidi}
+                {" · "}
+                {formatFrequency(
+                  selectedFrequency,
+                )}
+              </p>
+            </div>
+          ) : null}
+        </div>
+
+        {/* DETAILS */}
+        <aside
+          className="
+            min-w-0
+            md:border-l
+            md:border-white/[0.07]
+            md:pl-7
+          "
+        >
+          {/* Controls */}
           <div
             className="
-              mx-auto
-              mt-5
-              min-h-16
-              max-w-md
-              text-center
+              grid
+              gap-4
+              sm:grid-cols-2
+              md:grid-cols-1
+              xl:grid-cols-2
             "
           >
-            {selectedPitch ? (
-              <div
-                role="status"
-                aria-live="polite"
-              >
-                <p
-                  className="
-                    text-sm
-                    text-white/55
-                  "
-                >
-                  Selected{" "}
+            <label>
+              <span className="detail-label">
+                Mode
+              </span>
 
-                  <strong
-                    className="
-                      font-semibold
-                      text-cyan-200
-                    "
-                  >
-                    {
-                      selectedPitch.primary
-                    }
-
-                    {selectedPitch.secondary
-                      ? ` / ${selectedPitch.secondary}`
-                      : ""}
-                  </strong>
-
-                  {" · "}
-
-                  {selectedPitch.isRoot
-                    ? "Root"
-                    : selectedPitch.isScaleTone
-                      ? "Scale tone"
-                      : "Outside the scale"}
-                </p>
-
-                <p
-                  className="
-                    mt-2
-                    font-mono
-                    text-xs
-                    tracking-wide
-                    text-white/30
-                  "
-                >
-                  Octave{" "}
-                  {
-                    DEFAULT_AUDITION_OCTAVE
-                  }
-
-                  {" · "}
-
-                  MIDI{" "}
-                  {
-                    selectedMidi
-                  }
-
-                  {" · "}
-
-                  {
-                    formatFrequency(
-                      selectedFrequency,
-                    )
-                  }
-                </p>
-              </div>
-            ) : (
-              <p
-
-              >
-
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Notes */}
-      <div className="mt-8">
-        <p
-          className="
-            text-xs
-            font-bold
-            uppercase
-            tracking-[0.18em]
-            text-white/30
-          "
-        >
-          Notes
-        </p>
-
-        <div
-          className="
-            mt-3
-            flex
-            flex-wrap
-            gap-2
-          "
-        >
-          {notes.map(
-            (
-              note,
-              index,
-            ) => (
-              <div
-                key={`${note}-${index}`}
-                className="
-                  flex
-                  h-12
-                  min-w-12
-                  items-center
-                  justify-center
-                  rounded-xl
-                  border
-                  px-3
-                  text-base
-                  font-semibold
-                "
-                style={{
-                  borderColor:
-                    index === 0
-                      ? "var(--scale-accent)"
-                      : "rgba(255,255,255,0.08)",
-
-                  background:
-                    index === 0
-                      ? "color-mix(in srgb, var(--scale-accent) 13%, transparent)"
-                      : "rgba(255,255,255,0.025)",
-
-                  color:
-                    index === 0
-                      ? "white"
-                      : "rgba(255,255,255,0.72)",
-                }}
-              >
-                {note}
-              </div>
-            ),
-          )}
-        </div>
-      </div>
-
-      {/* Formula / semitones */}
-      <div
-        className="
-          mt-8
-          grid
-          gap-4
-          sm:grid-cols-2
-        "
-      >
-        <InfoBlock
-          label="Formula"
-          value={scale.formula.join(
-            "  ",
-          )}
-        />
-
-        <InfoBlock
-          label="Semitones"
-          value={scale.intervals.join(
-            " · ",
-          )}
-        />
-      </div>
-
-      {/* Relationship */}
-      {relationship ? (
-        <div
-          className="
-            mt-8
-            rounded-2xl
-            border
-            p-4
-          "
-          style={{
-            borderColor:
-              "color-mix(in srgb, var(--scale-accent) 20%, transparent)",
-
-            background:
-              "color-mix(in srgb, var(--scale-accent) 6%, transparent)",
-          }}
-        >
-          <p
-            className="
-              text-xs
-              font-bold
-              uppercase
-              tracking-[0.18em]
-            "
-            style={{
-              color:
-                "var(--scale-accent)",
-            }}
-          >
-            Relationship
-          </p>
-
-          <p
-            className="
-              mt-2
-              text-sm
-              leading-6
-              text-white/55
-            "
-          >
-            {relationship}
-          </p>
-        </div>
-      ) : null}
-
-      {/* Sibling modes */}
-      {/* <div className="mt-8">
-        <p
-          className="
-            text-xs
-            font-bold
-            uppercase
-            tracking-[0.18em]
-            text-white/30
-          "
-        >
-          Other modes in this
-          family
-        </p>
-
-        <div
-          className="
-            mt-3
-            flex
-            flex-wrap
-            gap-2
-          "
-        >
-          {siblings.map(
-            (sibling) => (
-              <button
-                key={
-                  sibling.id
-                }
-                type="button"
-                onClick={() =>
+              <select
+                value={scale.id}
+                onChange={(event) =>
                   onScaleSelect(
-                    sibling.id,
+                    event.target.value,
                   )
                 }
                 className="
-                  rounded-full
+                  mt-2
+                  h-11
+                  w-full
+                  rounded-xl
                   border
                   border-white/10
-                  bg-white/[0.025]
-                  px-3
-                  py-2
-                  text-xs
+                  bg-black/35
+                  px-4
+                  text-sm
                   font-semibold
-                  text-white/50
-                  transition
-                  hover:bg-white/[0.06]
-                  hover:text-white
+                  text-white/75
+                  outline-none
+                  transition-colors
+                  hover:border-white/20
+                  focus:border-cyan-300/35
                 "
               >
-                {
-                  sibling.name
+                {allScales.map(
+                  (candidate) => (
+                    <option
+                      key={
+                        candidate.id
+                      }
+                      value={
+                        candidate.id
+                      }
+                    >
+                      {candidate.modeName ??
+                        candidate.name}
+                    </option>
+                  ),
+                )}
+              </select>
+            </label>
+
+            <label>
+              <span className="detail-label">
+                Instrument
+              </span>
+
+              <select
+                value={instrumentId}
+                onChange={(event) =>
+                  setInstrumentId(
+                    event.target.value,
+                  )
                 }
-              </button>
-            ),
-          )}
-        </div> */}
-      {/* </div> */}
+                className="
+                  mt-2
+                  h-11
+                  w-full
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-black/35
+                  px-4
+                  text-sm
+                  font-semibold
+                  text-white/75
+                  outline-none
+                  transition-colors
+                  hover:border-white/20
+                  focus:border-cyan-300/35
+                "
+              >
+                <option
+                  value={
+                    instrumentId
+                  }
+                >
+                  Soft Keys
+                </option>
+              </select>
+            </label>
+          </div>
+
+          {audioError ? (
+            <p
+              role="alert"
+              className="
+                mt-3
+                text-xs
+                text-rose-300/80
+              "
+            >
+              {audioError}
+            </p>
+          ) : null}
+
+          {/* Tones */}
+          <DetailSection
+            label="Tones"
+          >
+            <div
+              className="
+                flex
+                flex-wrap
+                gap-2
+              "
+            >
+              {notes.map(
+                (
+                  note,
+                  index,
+                ) => (
+                  <span
+                    key={`${note}-${index}`}
+                    className="
+                      flex
+                      h-10
+                      min-w-10
+                      items-center
+                      justify-center
+                      rounded-lg
+                      border
+                      px-3
+                      text-sm
+                      font-semibold
+                    "
+                    style={{
+                      borderColor:
+                        index === 0
+                          ? "#67e8f9"
+                          : "rgba(255,255,255,0.08)",
+
+                      background:
+                        index === 0
+                          ? "rgba(103,232,249,0.10)"
+                          : "rgba(255,255,255,0.02)",
+
+                      color:
+                        index === 0
+                          ? "white"
+                          : "rgba(255,255,255,0.68)",
+                    }}
+                  >
+                    {displayNoteName(
+                      note,
+                    )}
+                  </span>
+                ),
+              )}
+            </div>
+          </DetailSection>
+
+          <DetailSection
+            label="Formula"
+          >
+            <TheoryValue>
+              {scale.formula.join(
+                " · ",
+              )}
+            </TheoryValue>
+          </DetailSection>
+
+          <DetailSection
+            label="Characteristic"
+          >
+            <TheoryValue>
+              {scale.characteristicDegrees
+                ?.join(" · ") ??
+                "—"}
+            </TheoryValue>
+          </DetailSection>
+
+          <DetailSection
+            label="Semitones"
+          >
+            <TheoryValue>
+              {scale.intervals.join(
+                " · ",
+              )}
+            </TheoryValue>
+          </DetailSection>
+        </aside>
+      </div>
     </section>
   );
 }
 
-function InfoBlock({
+function DetailSection({
   label,
-  value,
+  children,
 }) {
   return (
     <div
       className="
-        rounded-2xl
-        border
-        border-white/10
-        bg-white/[0.018]
-        p-4
+        mt-6
+        border-t
+        border-white/[0.07]
+        pt-5
       "
     >
-      <p
-        className="
-          text-[10px]
-          font-bold
-          uppercase
-          tracking-[0.18em]
-          text-white/30
-        "
-      >
+      <p className="detail-label">
         {label}
       </p>
 
-      <p
-        className="
-          mt-2
-          font-mono
-          text-sm
-          leading-6
-          text-white/70
-        "
-      >
-        {value}
-      </p>
+      <div className="mt-3">
+        {children}
+      </div>
     </div>
+  );
+}
+
+function TheoryValue({
+  children,
+}) {
+  return (
+    <p
+      className="
+        font-mono
+        text-sm
+        leading-6
+        text-white/65
+      "
+    >
+      {children}
+    </p>
   );
 }

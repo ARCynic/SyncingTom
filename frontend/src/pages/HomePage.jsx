@@ -220,42 +220,67 @@ export default function HomePage() {
             <div
               className="
                 hidden
+                w-full
                 max-w-md
-                border-l
-                border-white/[0.07]
-                pl-8
-                text-right
                 lg:block
                 lg:justify-self-end
               "
             >
-              <p
+              <div
                 className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.2em]
-                  text-cyan-300/45
+                  min-h-[110px]
+                  border-l-2
+                  border-cyan-300/30
+                  py-2
+                  pl-6
+                  text-left
                 "
               >
-                Did you know?
-              </p>
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                  "
+                >
+                  <span
+                    aria-hidden="true"
+                    className="
+                      h-2
+                      w-2
+                      rounded-full
+                      bg-cyan-300/70
+                      shadow-[0_0_10px_rgba(103,232,249,0.35)]
+                    "
+                  />
 
-              <p
-                key={
-                  knowledge.id
-                }
-                className="
-                  mt-3
-                  text-sm
-                  leading-6
-                  text-white/38
-                "
-              >
-                {
-                  knowledge.text
-                }
-              </p>
+                  <p
+                    className="
+                      text-xs
+                      font-semibold
+                      uppercase
+                      tracking-[0.16em]
+                      text-cyan-200/65
+                    "
+                  >
+                    Did you know?
+                  </p>
+                </div>
+
+                <p
+                  key={knowledge.id}
+                  className="
+                    mt-4
+                    max-w-sm
+                    text-[15px]
+                    font-medium
+                    leading-7
+                    text-white/68
+                  "
+                >
+                  {knowledge.text}
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import {
   SCALE_FAMILIES,
   SCALES,
   getScaleById,
+  getScaleFamilyById,
   getScalesByFamily,
 } from "@/data/scales/index.js";
 
@@ -15,20 +16,25 @@ import {
 } from "@/lib/scales/buildScale.js";
 
 import {
+  displayNoteName,
   parseNoteName,
 } from "@/lib/scales/notes.js";
+
+import {
+  describeModeRelationship,
+} from "@/lib/scales/relationships.js";
 
 import {
   PianoKeyboard,
 } from "@/components/scales/PianoKeyboard.jsx";
 
 import {
-  ScaleCard,
-} from "@/components/scales/ScaleCard.jsx";
-
-import {
   ScaleDetail,
 } from "@/components/scales/ScaleDetail.jsx";
+
+import {
+  ScaleFamilySelector,
+} from "@/components/scales/ScaleFamilySelector.jsx";
 
 const DEFAULT_FAMILY =
   SCALE_FAMILIES[0]?.id ??
@@ -39,33 +45,27 @@ const DEFAULT_SCALE =
     ?.scales[0]?.id ??
   "major";
 
-const DEFAULT_ROOT =
-  "C";
+const DEFAULT_ROOT = "C";
 
 export default function ScaleArchivePage() {
   const [
+    selectedFamilyId,
+    setSelectedFamilyId,
+  ] = useState(DEFAULT_FAMILY);
+
+  const [
     selectedScaleId,
     setSelectedScaleId,
-  ] = useState(
-    DEFAULT_SCALE,
-  );
+  ] = useState(DEFAULT_SCALE);
 
   const [
     root,
     setRoot,
-  ] = useState(
-    DEFAULT_ROOT,
-  );
-
-  const [
-    query,
-  ] = useState("");
+  ] = useState(DEFAULT_ROOT);
 
   const selectedFamily =
-    SCALE_FAMILIES.find(
-      (family) =>
-        family.id ===
-        DEFAULT_FAMILY,
+    getScaleFamilyById(
+      selectedFamilyId,
     ) ??
     SCALE_FAMILIES[0];
 
@@ -86,42 +86,6 @@ export default function ScaleArchivePage() {
     ) ??
     SCALES[0];
 
-  const filteredScales =
-    useMemo(() => {
-      const normalized =
-        query
-          .trim()
-          .toLowerCase();
-
-      if (!normalized) {
-        return familyScales;
-      }
-
-      return familyScales.filter(
-        (scale) => {
-          const haystack = [
-            scale.name,
-            scale.modeName,
-            scale.family,
-            ...(scale.aliases ??
-              []),
-            ...(scale.formula ??
-              []),
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-          return haystack.includes(
-            normalized,
-          );
-        },
-      );
-    }, [
-      familyScales,
-      query,
-    ]);
-
   const keyboardNotes =
     useMemo(
       () =>
@@ -137,21 +101,17 @@ export default function ScaleArchivePage() {
 
   const activePitchClasses =
     useMemo(
-      () =>
-        [
-          ...new Set(
-            keyboardNotes.map(
-              (note) =>
-                parseNoteName(
-                  note,
-                )
-                  .pitchClass,
-            ),
+      () => [
+        ...new Set(
+          keyboardNotes.map(
+            (note) =>
+              parseNoteName(
+                note,
+              ).pitchClass,
           ),
-        ],
-      [
-        keyboardNotes,
+        ),
       ],
+      [keyboardNotes],
     );
 
   const rootPitchClass =
@@ -160,10 +120,45 @@ export default function ScaleArchivePage() {
         parseNoteName(
           root,
         ).pitchClass,
-      [
-        root,
-      ],
+      [root],
     );
+
+  const relationship =
+    describeModeRelationship(
+      selectedScale,
+      familyScales,
+      root,
+    );
+
+  function handleFamilyChange(
+    familyId,
+  ) {
+    const family =
+      getScaleFamilyById(
+        familyId,
+      );
+
+    if (!family) {
+      return;
+    }
+
+    setSelectedFamilyId(
+      familyId,
+    );
+
+    if (
+      !family.scales.some(
+        (scale) =>
+          scale.id ===
+          selectedScaleId,
+      )
+    ) {
+      setSelectedScaleId(
+        family.scales[0]
+          ?.id ?? "",
+      );
+    }
+  }
 
   return (
     <main
@@ -174,20 +169,19 @@ export default function ScaleArchivePage() {
         max-w-screen-xl
         flex-1
         px-4
-        pb-8
+        pb-10
         pt-2
         sm:px-6
-        sm:pb-12
-        sm:pt-3
         lg:px-8
       "
     >
-      {/* Page header */}
       <header
         className="
-          mb-5
-          max-w-4xl
-          sm:mb-6
+          mb-6
+          flex
+          items-start
+          justify-between
+          gap-8
         "
       >
         <div
@@ -205,7 +199,6 @@ export default function ScaleArchivePage() {
             className="
               h-16
               w-16
-              shrink-0
               object-contain
               opacity-90
               sm:h-20
@@ -233,9 +226,7 @@ export default function ScaleArchivePage() {
             <p
               className="
                 mt-2
-                max-w-3xl
                 text-sm
-                leading-6
                 text-white/50
                 sm:text-[15px]
               "
@@ -246,126 +237,184 @@ export default function ScaleArchivePage() {
             </p>
           </div>
         </div>
+
+        <ScaleFamilySelector
+          families={
+            SCALE_FAMILIES
+          }
+          value={
+            selectedFamily.id
+          }
+          onChange={
+            handleFamilyChange
+          }
+        />
       </header>
 
-      {/* Root piano */}
+      {/* Root keyboard + current scale */}
       <section
         className="
           mb-6
-          rounded-[2rem]
-          border
-          border-white/10
-          bg-black/25
-          px-3
-          py-4
-          shadow-[0_24px_80px_rgba(0,0,0,0.16)]
-          backdrop-blur-sm
-          sm:px-5
-          sm:py-5
-        "
-      >
-        <PianoKeyboard
-          activePitchClasses={
-            activePitchClasses
-          }
-          rootPitchClass={
-            rootPitchClass
-          }
-          onRootChange={
-            setRoot
-          }
-        />
-      </section>
-
-
-      <div
-        className="
           grid
-          gap-6
-          lg:grid-cols-[20rem_minmax(0,1fr)]
+          gap-5
+          lg:grid-cols-[minmax(0,1fr)_18rem]
         "
       >
-        <section>
-          <div
+        <div
+          className="
+            rounded-[2rem]
+            border
+            border-white/10
+            bg-black/25
+            p-4
+            shadow-[0_20px_60px_rgba(0,0,0,0.17)]
+            backdrop-blur-sm
+          "
+        >
+          <p
             className="
-              mb-3
-              flex
-              items-center
-              justify-between
-              gap-3
+              mb-2
+              px-2
+              text-[10px]
+              font-bold
+              uppercase
+              tracking-[0.18em]
+              text-white/30
             "
           >
-            <h2
-              className="
-                text-sm
-                font-semibold
-                text-white/70
-              "
-            >
-              {
-                selectedFamily.listLabel
-              }
-            </h2>
-          </div>
+            Select root
+          </p>
 
-          <div
+          <PianoKeyboard
+            activePitchClasses={
+              activePitchClasses
+            }
+            rootPitchClass={
+              rootPitchClass
+            }
+            onRootChange={
+              setRoot
+            }
+          />
+        </div>
+
+        <aside
+          className="
+            flex
+            min-h-full
+            flex-col
+            rounded-[2rem]
+            border
+            border-white/10
+            bg-black/25
+            p-6
+            shadow-[0_20px_60px_rgba(0,0,0,0.17)]
+            backdrop-blur-sm
+          "
+        >
+          <p
             className="
-              grid
-              gap-2
-              sm:grid-cols-2
-              lg:grid-cols-1
+              text-[10px]
+              font-bold
+              uppercase
+              tracking-[0.2em]
+              text-cyan-300/65
             "
           >
-            {filteredScales.map(
-              (scale) => (
-                <ScaleCard
-                  key={
-                    scale.id
-                  }
-                  scale={
-                    scale
-                  }
-                  selected={
-                    selectedScale.id ===
-                    scale.id
-                  }
-                  onSelect={
-                    setSelectedScaleId
-                  }
-                />
-              ),
-            )}
-          </div>
+            Selected scale
+          </p>
 
-          {filteredScales.length ===
-          0 ? (
+          <h2
+            className="
+              mt-4
+              text-3xl
+              font-semibold
+              tracking-[-0.04em]
+              text-white
+            "
+          >
+            {displayNoteName(root)}{" "}
+
+            <span className="scale-gradient-text">
+              {selectedScale.name}
+            </span>
+          </h2>
+
+          <p
+            className="
+              mt-2
+              text-xs
+              capitalize
+              text-white/35
+            "
+          >
+            {selectedScale.modeName}
+            {" · "}
+            Mode{" "}
+            {selectedScale.modeDegree}
+            {" · "}
+            {selectedScale.quality}
+          </p>
+
+          <p
+            className="
+              mt-5
+              text-sm
+              leading-6
+              text-white/50
+            "
+          >
+            {selectedScale.description}
+          </p>
+
+          {relationship ? (
             <div
               className="
-                rounded-2xl
-                border
-                border-white/10
-                bg-white/[0.02]
-                p-5
-                text-sm
-                text-white/40
+                mt-auto
+                border-t
+                border-white/[0.07]
+                pt-5
               "
             >
-              No scales match that
-              search.
+              <p
+                className="
+                  text-[9px]
+                  font-bold
+                  uppercase
+                  tracking-[0.18em]
+                  text-white/25
+                "
+              >
+                Relationship
+              </p>
+
+              <p
+                className="
+                  mt-2
+                  text-sm
+                  leading-6
+                  text-white/55
+                "
+              >
+                {relationship}
+              </p>
             </div>
           ) : null}
-        </section>
+        </aside>
+      </section>
 
-        <ScaleDetail
-  scale={
-    selectedScale
-  }
-  root={root}
-  allScales={
-    familyScales
-  }
-/>
-      </div>
+      <ScaleDetail
+        scale={
+          selectedScale
+        }
+        root={root}
+        allScales={
+          familyScales
+        }
+        onScaleSelect={
+          setSelectedScaleId
+        }
+      />
     </main>
   );
 }
