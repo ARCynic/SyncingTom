@@ -244,13 +244,14 @@ export default function Navbar() {
               alt="SyncingTom"
               draggable="false"
               className="
-                syncingtom-logo
                 h-full
                 w-full
                 object-contain
+                drop-shadow-[0_0_12px_rgba(192,132,252,0.38)]
                 transition
                 duration-300
                 group-hover:brightness-125
+                group-hover:drop-shadow-[0_0_18px_rgba(192,132,252,0.60)]
               "
             />
           </div>
