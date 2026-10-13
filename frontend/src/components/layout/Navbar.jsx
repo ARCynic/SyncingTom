@@ -45,7 +45,7 @@ const items = [
   },
   {
     label: "Fret D Scale",
-    to: "/fret_the_scales",
+    to: "/fret-the-scales",
   },
 ];
 

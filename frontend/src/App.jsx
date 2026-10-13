@@ -11,6 +11,8 @@ import PolymeterPage from "@/pages/polymeter/PolymeterPage.jsx";
 import FretTheScalesPage from "./pages/fret_the_scales/FretTheScalesPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import IssuesPage from "@/pages/issues/IssuesPage.jsx";
+import GenreAtlasPage from "./pages/genre_atlas/GenreAtlasPage.jsx";
+import GenreDetailPage from "./pages/genre_atlas/GenreDetailPage.jsx";
 
 export default function App() {
   return (
@@ -22,9 +24,11 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/subdivision-ladder" element={<SubdivisionLadderPage />} />
         <Route path="/polymeter" element={<PolymeterPage />} />
-        <Route path="/fret_the_scales" element={<FretTheScalesPage />}/>
+        <Route path="/fret-the-scales" element={<FretTheScalesPage />}/>
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/issues" element={ <IssuesPage />} />
+        <Route path="/genre-atlas" element={ <GenreAtlasPage />} />
+        <Route path="/genre-atlas/:genreSlug" element={ <GenreDetailPage />} />
         <Route path="*" element={<NotFoundPage />} />
         
       </Route>

@@ -118,7 +118,7 @@ export const HOME_TOOLS = [
       "Designed around note recall, scale degrees, positions, and eventually moving confidently across the neck.",
 
     route:
-      "/fret_the_scales",
+      "/fret-the-scales",
 
     stamp:
       "/assets/fret_the_scale.png",

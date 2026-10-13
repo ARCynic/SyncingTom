@@ -267,3 +267,48 @@ button:disabled {
     animation: none;
   }
 }
+/* =========================================
+   Genre Atlas
+   ========================================= */
+
+.genre-theme {
+  --genre-accent: #67e8f9;
+  --genre-accent-2: #c084fc;
+}
+
+.genre-gradient-text {
+  background:
+    linear-gradient(
+      90deg,
+      var(--genre-accent),
+      var(--genre-accent-2)
+    );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+}
+
+.genre-theme
+  :where(
+    button,
+    input,
+    select,
+    a,
+    [role="button"]
+  ):focus-visible {
+  outline: 2px solid
+    var(--genre-accent);
+  outline-offset: 3px;
+}
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .genre-theme * {
+    transition-duration:
+      0.01ms !important;
+  }
+}

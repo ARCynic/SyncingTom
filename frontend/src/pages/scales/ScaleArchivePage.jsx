@@ -1,7 +1,4 @@
-import {
-  useMemo,
-  useState,
-} from "react";
+import { useState } from "react";
 
 import {
   SCALE_FAMILIES,
@@ -87,41 +84,26 @@ export default function ScaleArchivePage() {
     SCALES[0];
 
   const keyboardNotes =
-    useMemo(
-      () =>
-        buildScaleNotes(
-          root,
-          selectedScale,
-        ),
-      [
-        root,
-        selectedScale,
-      ],
+    buildScaleNotes(
+      root,
+      selectedScale,
     );
 
-  const activePitchClasses =
-    useMemo(
-      () => [
-        ...new Set(
-          keyboardNotes.map(
-            (note) =>
-              parseNoteName(
-                note,
-              ).pitchClass,
-          ),
-        ),
-      ],
-      [keyboardNotes],
-    );
+  const activePitchClasses = [
+    ...new Set(
+      keyboardNotes.map(
+        (note) =>
+          parseNoteName(
+            note,
+          ).pitchClass,
+      ),
+    ),
+  ];
 
   const rootPitchClass =
-    useMemo(
-      () =>
-        parseNoteName(
-          root,
-        ).pitchClass,
-      [root],
-    );
+    parseNoteName(
+      root,
+    ).pitchClass;
 
   const relationship =
     describeModeRelationship(
@@ -146,13 +128,14 @@ export default function ScaleArchivePage() {
       familyId,
     );
 
-    if (
-      !family.scales.some(
+    const scaleStillExists =
+      family.scales.some(
         (scale) =>
           scale.id ===
           selectedScaleId,
-      )
-    ) {
+      );
+
+    if (!scaleStillExists) {
       setSelectedScaleId(
         family.scales[0]
           ?.id ?? "",
@@ -251,7 +234,6 @@ export default function ScaleArchivePage() {
         />
       </header>
 
-      {/* Root keyboard + current scale */}
       <section
         className="
           mb-6
