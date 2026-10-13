@@ -3,6 +3,7 @@ import {
 } from "react-router";
 
 import FloatingNotes from "@/components/home/FloatingNotes.jsx";
+import IssueBeacon from "@/components/issues/IssueBeacon.jsx";
 
 import Footer from "./Footer.jsx";
 import Navbar from "./Navbar.jsx";
@@ -124,6 +125,7 @@ export default function SiteLayout() {
 
         <Footer />
       </div>
+      <IssueBeacon />
     </div>
   );
 }
