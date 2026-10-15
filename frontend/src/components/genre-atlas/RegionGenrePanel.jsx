@@ -14,7 +14,7 @@ export function RegionGenrePanel({
       <aside
         className="
           flex
-          min-h-full
+          min-h-[26rem]
           flex-col
           justify-between
           rounded-[2rem]
@@ -26,27 +26,54 @@ export function RegionGenrePanel({
         "
       >
         <div>
+          <div
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-full
+              border
+              border-cyan-300/15
+              bg-cyan-300/[0.05]
+            "
+          >
+            <span
+              aria-hidden="true"
+              className="
+                h-2
+                w-2
+                rounded-full
+                bg-cyan-300/70
+                shadow-[0_0_12px_rgba(103,232,249,0.5)]
+              "
+            />
+          </div>
+
           <p
             className="
+              mt-6
               text-[10px]
               font-bold
               uppercase
               tracking-[0.2em]
-              text-cyan-300/60
+              text-cyan-300/55
             "
           >
-            Explore the map
+            Explore
           </p>
 
           <h2
             className="
-              mt-4
+              mt-3
               text-2xl
               font-semibold
+              tracking-[-0.04em]
               text-white
             "
           >
-            Musical geography
+            Find the sound
           </h2>
 
           <p
@@ -57,28 +84,33 @@ export function RegionGenrePanel({
               text-white/45
             "
           >
-            Hover, focus or select a
+            Hover or focus a
             highlighted part of the
-            world to reveal genres
-            associated with that
+            world to see the genres
+            connected with that
             region.
           </p>
         </div>
 
-        <p
+        <div
           className="
-            mt-8
-            text-xs
-            leading-6
-            text-white/25
+            border-t
+            border-white/[0.07]
+            pt-5
           "
         >
-          Genres can appear in more
-          than one region because
-          musical traditions travel,
-          mix and develop across
-          borders.
-        </p>
+          <p
+            className="
+              text-xs
+              leading-6
+              text-white/25
+            "
+          >
+            Select a region to keep
+            it open while exploring
+            its genres.
+          </p>
+        </div>
       </aside>
     );
   }
@@ -91,32 +123,53 @@ export function RegionGenrePanel({
   return (
     <aside
       className="
+        min-h-[26rem]
         rounded-[2rem]
         border
-        border-white/10
-        bg-black/25
+        border-cyan-300/15
+        bg-black/30
         p-6
+        shadow-[0_20px_60px_rgba(0,0,0,0.15)]
         backdrop-blur-sm
       "
     >
-      <p
+      <div
         className="
-          text-[10px]
-          font-bold
-          uppercase
-          tracking-[0.2em]
-          text-cyan-300/60
+          flex
+          items-center
+          gap-2
         "
       >
-        Region
-      </p>
+        <span
+          aria-hidden="true"
+          className="
+            h-1.5
+            w-1.5
+            rounded-full
+            bg-cyan-300
+            shadow-[0_0_10px_rgba(103,232,249,0.55)]
+          "
+        />
+
+        <p
+          className="
+            text-[10px]
+            font-bold
+            uppercase
+            tracking-[0.2em]
+            text-cyan-300/65
+          "
+        >
+          Region
+        </p>
+      </div>
 
       <h2
         className="
-          mt-3
+          mt-4
           text-3xl
           font-semibold
-          tracking-[-0.04em]
+          tracking-[-0.045em]
           text-white
         "
       >
@@ -125,24 +178,21 @@ export function RegionGenrePanel({
 
       <p
         className="
-          mt-2
-          text-xs
-          text-white/30
+          mt-3
+          text-sm
+          leading-6
+          text-white/35
         "
       >
-        {genres.length}{" "}
-        {genres.length === 1
-          ? "genre"
-          : "genres"}{" "}
-        in the current atlas
+        Explore musical traditions
+        associated with this part of
+        the world.
       </p>
 
       <div
         className="
           mt-6
-          divide-y
-          divide-white/[0.07]
-          border-y
+          border-t
           border-white/[0.07]
         "
       >
@@ -159,16 +209,23 @@ export function RegionGenrePanel({
                 items-center
                 justify-between
                 gap-4
+                border-b
+                border-white/[0.07]
                 py-4
                 outline-none
               "
             >
-              <div>
+              <div
+                className="
+                  min-w-0
+                "
+              >
                 <p
                   className="
                     font-semibold
                     text-white/75
                     transition-colors
+                    duration-100
                     group-hover:text-cyan-200
                     group-focus-visible:text-cyan-200
                   "
@@ -179,7 +236,8 @@ export function RegionGenrePanel({
                 <p
                   className="
                     mt-1
-                    text-xs
+                    truncate
+                    text-[11px]
                     text-white/30
                   "
                 >
@@ -190,8 +248,11 @@ export function RegionGenrePanel({
               <span
                 aria-hidden="true"
                 className="
+                  shrink-0
+                  text-lg
                   text-white/20
                   transition
+                  duration-100
                   group-hover:translate-x-1
                   group-hover:text-cyan-300
                 "

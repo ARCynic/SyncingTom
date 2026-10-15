@@ -10,9 +10,18 @@ import {
   getRegionByCountryId,
 } from "@/data/genreAtlas/index.js";
 
-function normalizeCountryId(
-  id,
-) {
+const COLORS = {
+  land: "#3b4750",
+  landBorder: "#5b6871",
+
+  mapped: "#35646c",
+  mappedBorder: "#76a3aa",
+
+  active: "#4faeb5",
+  activeBorder: "#b9fffa",
+};
+
+function normalizeCountryId(id) {
   return String(
     id ?? "",
   ).padStart(3, "0");
@@ -30,21 +39,23 @@ export function WorldGenreMap({
         relative
         w-full
         overflow-hidden
-        rounded-[1.6rem]
-        border
-        border-white/[0.07]
-        bg-black/20
+        bg-[#0d1519]
       "
+      style={{
+        background:
+          "radial-gradient(circle at 28% 42%, rgba(103,232,249,0.08), transparent 32%), radial-gradient(circle at 75% 50%, rgba(192,132,252,0.055), transparent 34%), #0d1519",
+      }}
     >
       <ComposableMap
         projection="geoEqualEarth"
         width={900}
-        height={500}
+        height={430}
         projectionConfig={{
-          scale: 155,
+          scale: 168,
           center: [0, 10],
         }}
         className="
+          block
           h-auto
           w-full
         "
@@ -54,9 +65,7 @@ export function WorldGenreMap({
             worldMap
           }
         >
-          {({
-            geographies,
-          }) =>
+          {({ geographies }) =>
             geographies.map(
               (geo) => {
                 const countryId =
@@ -69,69 +78,116 @@ export function WorldGenreMap({
                     countryId,
                   );
 
-                const active =
+                const isMapped =
+                  Boolean(region);
+
+                const isActive =
                   Boolean(
                     region &&
                       region.id ===
                         activeRegionId,
                   );
 
-                const dimmed =
+                const isDimmed =
                   Boolean(
                     activeRegionId &&
-                      !active,
+                      region &&
+                      !isActive,
                   );
+
+                const countryName =
+                  geo.properties
+                    ?.name ??
+                  "Country";
+
+                const fill =
+                  isActive
+                    ? COLORS.active
+                    : isMapped
+                      ? COLORS.mapped
+                      : COLORS.land;
+
+                const stroke =
+                  isActive
+                    ? COLORS.activeBorder
+                    : isMapped
+                      ? COLORS.mappedBorder
+                      : COLORS.landBorder;
 
                 return (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
+                    fill={fill}
+                    stroke={stroke}
+                    strokeWidth={
+                      isActive
+                        ? 1.5
+                        : isMapped
+                          ? 0.8
+                          : 0.55
+                    }
+                    opacity={
+                      isDimmed
+                        ? 0.55
+                        : 1
+                    }
+                    vectorEffect="non-scaling-stroke"
                     tabIndex={
-                      region
+                      isMapped
                         ? 0
                         : -1
                     }
                     role={
-                      region
+                      isMapped
                         ? "button"
                         : undefined
                     }
                     aria-label={
                       region
-                        ? `${geo.properties?.name ?? "Country"} — ${region.name}`
-                        : geo.properties
-                            ?.name
+                        ? `${countryName} — ${region.name}`
+                        : countryName
                     }
-                    onMouseEnter={() =>
-                      region &&
-                      onRegionEnter?.(
-                        region.id,
-                      )
+                    aria-pressed={
+                      isMapped
+                        ? isActive
+                        : undefined
                     }
-                    onMouseLeave={() =>
-                      onRegionLeave?.()
-                    }
-                    onFocus={() =>
-                      region &&
-                      onRegionEnter?.(
-                        region.id,
-                      )
-                    }
-                    onBlur={() =>
-                      onRegionLeave?.()
-                    }
-                    onClick={() =>
-                      region &&
-                      onRegionSelect?.(
-                        region.id,
-                      )
-                    }
+                    onMouseEnter={() => {
+                      if (region) {
+                        onRegionEnter?.(
+                          region.id,
+                        );
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (region) {
+                        onRegionLeave?.();
+                      }
+                    }}
+                    onFocus={() => {
+                      if (region) {
+                        onRegionEnter?.(
+                          region.id,
+                        );
+                      }
+                    }}
+                    onBlur={() => {
+                      if (region) {
+                        onRegionLeave?.();
+                      }
+                    }}
+                    onClick={() => {
+                      if (region) {
+                        onRegionSelect?.(
+                          region.id,
+                        );
+                      }
+                    }}
                     onKeyDown={(
                       event,
                     ) => {
-                      if (
-                        !region
-                      ) {
+                      if (!region) {
                         return;
                       }
 
@@ -149,72 +205,15 @@ export function WorldGenreMap({
                       }
                     }}
                     style={{
-                      default: {
-                        fill: active
-                          ? "#163239"
-                          : dimmed
-                            ? "#0a0d0f"
-                            : region
-                              ? "#11191c"
-                              : "#0b0e10",
+                      outline: "none",
 
-                        stroke: active
-                          ? "#67e8f9"
-                          : region
-                            ? "rgba(255,255,255,0.13)"
-                            : "rgba(255,255,255,0.055)",
+                      cursor:
+                        isMapped
+                          ? "pointer"
+                          : "default",
 
-                        strokeWidth:
-                          active
-                            ? 1.4
-                            : 0.6,
-
-                        outline:
-                          "none",
-
-                        transition:
-                          "fill 120ms ease, stroke 120ms ease, opacity 120ms ease",
-
-                        opacity:
-                          dimmed
-                            ? 0.48
-                            : 1,
-                      },
-
-                      hover: {
-                        fill: region
-                          ? "#163239"
-                          : "#0b0e10",
-
-                        stroke: region
-                          ? "#67e8f9"
-                          : "rgba(255,255,255,0.055)",
-
-                        strokeWidth:
-                          region
-                            ? 1.4
-                            : 0.6,
-
-                        outline:
-                          "none",
-
-                        cursor:
-                          region
-                            ? "pointer"
-                            : "default",
-                      },
-
-                      pressed: {
-                        fill: region
-                          ? "#1b4149"
-                          : "#0b0e10",
-
-                        stroke:
-                          "#67e8f9",
-
-                        outline:
-                          "none",
-                      },
+                      transition:
+                        "fill 100ms ease, stroke 100ms ease, opacity 100ms ease",
                     }}
                   />
                 );
@@ -229,10 +228,10 @@ export function WorldGenreMap({
         className="
           pointer-events-none
           absolute
-          inset-x-[12%]
+          inset-x-[18%]
           bottom-0
-          h-20
-          bg-cyan-300/[0.03]
+          h-16
+          bg-cyan-300/[0.045]
           blur-3xl
         "
       />

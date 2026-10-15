@@ -3,7 +3,6 @@ import {
 } from "react";
 
 import {
-  GENRE_REGIONS,
   getRegionById,
 } from "@/data/genreAtlas/index.js";
 
@@ -34,6 +33,17 @@ export default function GenreAtlasPage() {
     getRegionById(
       activeRegionId,
     );
+
+  function handleRegionSelect(
+    regionId,
+  ) {
+    setSelectedRegionId(
+      (current) =>
+        current === regionId
+          ? null
+          : regionId,
+    );
+  }
 
   return (
     <main
@@ -106,29 +116,32 @@ export default function GenreAtlasPage() {
         className="
           grid
           gap-5
-          lg:grid-cols-[minmax(0,1fr)_20rem]
+          lg:grid-cols-[minmax(0,1fr)_19rem]
+          lg:items-stretch
         "
       >
         <div
           className="
+            overflow-hidden
             rounded-[2rem]
             border
             border-white/10
-            bg-black/25
-            p-4
-            shadow-[0_24px_80px_rgba(0,0,0,0.18)]
+            bg-[#080c0f]/80
+            shadow-[0_24px_80px_rgba(0,0,0,0.20)]
             backdrop-blur-sm
-            sm:p-5
           "
         >
           <div
             className="
-              mb-4
               flex
-              items-center
+              items-end
               justify-between
-              gap-4
-              px-1
+              gap-6
+              px-5
+              pb-3
+              pt-5
+              sm:px-6
+              sm:pt-6
             "
           >
             <div>
@@ -137,8 +150,8 @@ export default function GenreAtlasPage() {
                   text-[10px]
                   font-bold
                   uppercase
-                  tracking-[0.18em]
-                  text-white/30
+                  tracking-[0.2em]
+                  text-cyan-300/55
                 "
               >
                 World map
@@ -146,29 +159,30 @@ export default function GenreAtlasPage() {
 
               <p
                 className="
-                  mt-1
-                  text-xs
-                  text-white/30
+                  mt-2
+                  text-sm
+                  text-white/38
                 "
               >
-                Hover or select a
-                highlighted region
+                Move across the map
+                to discover regional
+                music traditions.
               </p>
             </div>
 
-            <p
-              className="
-                hidden
-                text-xs
-                text-white/20
-                sm:block
-              "
-            >
-              {
-                GENRE_REGIONS.length
-              }{" "}
-              mapped regions
-            </p>
+            {activeRegion ? (
+              <p
+                className="
+                  hidden
+                  text-xs
+                  font-semibold
+                  text-cyan-200/60
+                  sm:block
+                "
+              >
+                {activeRegion.name}
+              </p>
+            ) : null}
           </div>
 
           <WorldGenreMap
@@ -183,16 +197,8 @@ export default function GenreAtlasPage() {
                 null,
               )
             }
-            onRegionSelect={(
-              regionId,
-            ) =>
-              setSelectedRegionId(
-                (current) =>
-                  current ===
-                  regionId
-                    ? null
-                    : regionId,
-              )
+            onRegionSelect={
+              handleRegionSelect
             }
           />
         </div>
